@@ -8,8 +8,9 @@ export default class GameTitle {
     const titleContainer = document.createElement('div');
     titleContainer.classList.add('title__container');
 
-    const snakeIcon = document.createElement('div');
+    const snakeIcon = document.createElement('img');
     snakeIcon.classList.add('snake__icon');
+    snakeIcon.setAttribute('src', 'src/assets/snake-icon.svg');
 
     const titleText = document.createElement('div');
     titleText.classList.add('title__text');
