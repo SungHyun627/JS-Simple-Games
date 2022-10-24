@@ -1,0 +1,38 @@
+html {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #265515;
+  margin: 0;
+  padding: 0;
+}
+
+.page__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90vh;
+  height: 90vh;
+  margin: 10px auto;
+}
+
+.title__container {
+  display: flex;
+  margin-top: 20px;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.snake__icon {
+  background: no-repeat center url('../assets/snake-icon.svg');
+  height: 90px;
+  width: 90px;
+}
+
+.title__text {
+  margin-left: 20px;
+  font-size: 70px;
+  color: #fff;
+}
