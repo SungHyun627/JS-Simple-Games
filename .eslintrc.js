@@ -12,5 +12,7 @@ module.exports = {
     'max-depth': ['error', 3],
     'max-lines-per-function': ['error', 15],
     'no-new': 'off',
+    'import/extensions': ['off'],
+    'class-methods-use-this': ['off'],
   },
 };
