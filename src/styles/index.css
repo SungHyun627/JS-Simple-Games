@@ -25,12 +25,6 @@ body {
   align-items: center;
 }
 
-.snake__icon {
-  background: no-repeat center url('../assets/snake-icon.svg');
-  height: 90px;
-  width: 90px;
-}
-
 .title__text {
   margin-left: 20px;
   font-size: 70px;
