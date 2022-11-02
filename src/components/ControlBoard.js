@@ -8,10 +8,15 @@ export default class ControlBoard {
     const controlBoardContainer = document.createElement('div');
     controlBoardContainer.classList.add('control-board__container');
 
+    const startButton = document.createElement('button');
+    startButton.classList.add('restart-btn');
+    startButton.innerHTML = 'Restart';
+
     const resetButton = document.createElement('button');
     resetButton.classList.add('reset-btn');
-    resetButton.innerHTML = 'GAME RESET';
+    resetButton.innerHTML = 'Reset';
 
+    controlBoardContainer.appendChild(startButton);
     controlBoardContainer.appendChild(resetButton);
 
     container.appendChild(controlBoardContainer);
