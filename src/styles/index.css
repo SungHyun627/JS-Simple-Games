@@ -96,17 +96,24 @@ body {
 
 .control-board__container {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  width: 60%;
+  width: 65%;
   margin: 10px 0
 }
 
-.reset-btn {
+.control-board__container button {
   font-size: 40px;
   color: #ffffff;
   border-radius: 10px;
   border: 0;
-  padding: 5px 15px;
+  padding: 5px 35px;
+}
+
+.restart-btn {
   background-color: #D33039;
+}
+
+.reset-btn {
+  background-color: #0057FF;
 }
