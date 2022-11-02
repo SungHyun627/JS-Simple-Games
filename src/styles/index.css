@@ -34,7 +34,7 @@ body {
 .score-board__container {
   display: flex;
   margin: 10px 0;
-  width: 80%;
+  width: 70%;
 }
 
 .realtime__score {
@@ -78,4 +78,18 @@ body {
 
 .cell-odd {
   background-color: #61BB29;
+}
+
+.snake__cell {
+  background-color: #0057FF;
+}
+
+.snake__head {
+  background: url('../assets/snake-head.svg');
+  background-color: #ffffff;
+}
+
+.apple-icon {
+  width: 25px;
+  height: 25px;
 }
