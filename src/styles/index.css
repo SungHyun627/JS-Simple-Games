@@ -110,10 +110,59 @@ body {
   padding: 5px 35px;
 }
 
-.restart-btn {
+.restart__btn {
   background-color: #D33039;
 }
 
-.reset-btn {
+.reset__btn {
   background-color: #0057FF;
+}
+
+.modal__container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  background-color: #0E768D;
+  padding: 80px 100px;
+}
+
+.modal__gameover__text {
+  font-size: 70px;
+  font-weight: bold;
+}
+
+.modal__score__result {
+  display: flex;
+  text-align: center;
+}
+
+.modal__score__result img {
+  margin: 10px 40px;
+}
+
+.modal__control__btns {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal__control__btns {
+  margin-top: 20px;
+}
+
+.modal__control__btns button {
+  padding: 10px 30px;
+  border: none;
+  border-radius: 20px;
+  font-size: 60px;
+  color: #fff;
+  font-style: italic;
+}
+
+.modal__restart__btn {
+  background-color: #083366;
+  margin-bottom: 20px;
+}
+
+.modal__stopplaying__btn {
+  background-color: #551515;
 }
