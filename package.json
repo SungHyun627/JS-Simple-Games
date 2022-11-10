@@ -1,5 +1,5 @@
 {
-  "name": "js-simple-games",
+  "name": "js-snakegame",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/SungHyun627/JS-Simple-Games#readme",
   "devDependencies": {
+    "@babel/eslint-parser": "^7.19.1",
     "eslint": "^8.25.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
