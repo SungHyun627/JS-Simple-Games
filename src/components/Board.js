@@ -1,5 +1,6 @@
 import { BOARD_ROW_LENGTH } from '../constants/constants.js';
 import { createApple } from '../utils/createApple.js';
+import { directionKeys, directions } from '../utils/controlSnake.js';
 
 const initialSnakeState = [
   { x: 9, y: 6 },
@@ -18,6 +19,7 @@ export default class Board {
     this.container = container;
     this.state = { ...initialState };
     this.initBoard(container);
+    this.moveSnake();
   }
 
   setState(newState) {
@@ -67,6 +69,27 @@ export default class Board {
       boardContainer.appendChild(cell);
     });
     container.appendChild(boardContainer);
+  }
+
+  isSameDirection(key) {
+    return key === directionKeys[this.state.direction];
+  }
+
+  isReverseDirection(key) {
+    return key === directionKeys[(this.state.direction + 2) % 4];
+  }
+
+  changeDirection(e) {
+    if (
+      directionKeys.includes(e.key) &&
+      !this.isSameDirection(e.key) &&
+      !this.isReverseDirection(e.key)
+    )
+      this.setState({ direction: directions[e.key.replace('Arrow', '')] });
+  }
+
+  moveSnake() {
+    window.addEventListener('keyup', (e) => this.changeDirection(e));
   }
 
   render() {
