@@ -17,10 +17,16 @@ export default class Board {
   constructor(container) {
     this.container = container;
     this.state = { ...initialState };
-    this.render(container);
+    this.initBoard(container);
   }
 
-  render(container) {
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
+    console.log(this.state);
+    this.render(this.container);
+  }
+
+  initBoard(container) {
     const boardContainer = document.createElement('div');
     boardContainer.classList.add('board__container');
     const board = new Array(BOARD_ROW_LENGTH ** 2).fill('empty');
@@ -61,5 +67,28 @@ export default class Board {
       boardContainer.appendChild(cell);
     });
     container.appendChild(boardContainer);
+  }
+
+  render() {
+    this.state.snakeQueue.forEach((snakePos, snakeIdx) => {
+      const { x: snakePosX, y: snakePosY } = snakePos;
+      const snakeCell = document.querySelector(
+        `[data-row="${snakePosX}"][data-col="${snakePosY}"]`
+      );
+      snakeCell.classList.add('snake__cell');
+      if (snakeIdx === 0) {
+        snakeCell.classList.add('snake__head');
+      }
+    });
+
+    const { x: applePosX, y: applePosY } = this.state.applePos;
+    const appleCell = document.querySelector(
+      `.board__cell[data-row="${applePosX}"][data-col="${applePosY}"]`
+    );
+    appleCell.classList.add('apple__cell');
+    const appleIcon = document.createElement('img');
+    appleIcon.setAttribute('src', './src/assets/apple.svg');
+    appleIcon.classList.add('apple-icon');
+    appleCell.appendChild(appleIcon);
   }
 }
