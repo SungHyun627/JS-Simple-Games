@@ -2,14 +2,15 @@ import { BOARD_ROW_LENGTH } from '../constants/constants.js';
 import { createApple } from '../utils/createApple.js';
 
 const initialSnakeState = [
-  { x: 9, y: 6, dir: 0 },
-  { x: 9, y: 5, dir: 0 },
-  { x: 9, y: 4, dir: 0 },
+  { x: 9, y: 6 },
+  { x: 9, y: 5 },
+  { x: 9, y: 4 },
 ];
 
 const initialState = {
   applePos: { ...createApple(initialSnakeState) },
   snakeQueue: [...initialSnakeState],
+  direction: 0,
 };
 
 export default class Board {
