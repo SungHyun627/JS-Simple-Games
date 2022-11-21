@@ -1,30 +1,17 @@
 import { BOARD_ROW_LENGTH } from '../constants/constants.js';
-import { createApple } from '../utils/createApple.js';
 import { directionKeys, directions } from '../utils/controlSnake.js';
-
-const initialSnakeState = [
-  { x: 9, y: 6 },
-  { x: 9, y: 5 },
-  { x: 9, y: 4 },
-];
-
-const initialState = {
-  applePos: { ...createApple(initialSnakeState) },
-  snakeQueue: [...initialSnakeState],
-  direction: 0,
-};
+import { createApple } from '../utils/createApple.js';
 
 export default class Board {
-  constructor(container) {
+  constructor(container, initialState) {
     this.container = container;
-    this.state = { ...initialState };
+    this.state = { ...initialState, applePos: { ...createApple(initialState.snakeQueue) } };
     this.initBoard(container);
     this.moveSnake();
   }
 
   setState(newState) {
     this.state = { ...this.state, ...newState };
-    console.log(this.state);
     this.render(this.container);
   }
 
@@ -49,7 +36,7 @@ export default class Board {
         cell.classList.add('cell-odd');
       }
 
-      initialState.snakeQueue.forEach((snakePos, snakeIdx) => {
+      this.state.snakeQueue.forEach((snakePos, snakeIdx) => {
         const { x, y } = snakePos;
         if (x === rowIdx && y === colIdx) {
           cell.classList.add('snake__cell');
@@ -59,7 +46,7 @@ export default class Board {
         }
       });
 
-      if (rowIdx === initialState.applePos.x && colIdx === initialState.applePos.y) {
+      if (rowIdx === this.state.applePos.x && colIdx === this.state.applePos.y) {
         cell.classList.add('apple__cell');
         const apple = document.createElement('img');
         apple.setAttribute('src', './src/assets/apple.svg');
@@ -79,7 +66,7 @@ export default class Board {
     return key === directionKeys[(this.state.direction + 2) % 4];
   }
 
-  changeDirection(e) {
+  setDirection(e) {
     if (
       directionKeys.includes(e.key) &&
       !this.isSameDirection(e.key) &&
@@ -88,9 +75,11 @@ export default class Board {
       this.setState({ direction: directions[e.key.replace('Arrow', '')] });
   }
 
-  moveSnake() {
-    window.addEventListener('keyup', (e) => this.changeDirection(e));
+  changeDirection() {
+    window.addEventListener('keyup', (e) => this.setDirection(e));
   }
+
+  moveSnake() {}
 
   render() {
     this.state.snakeQueue.forEach((snakePos, snakeIdx) => {
