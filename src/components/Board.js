@@ -1,17 +1,37 @@
-import { BOARD_ROW_LENGTH } from '../constants/constants.js';
-import { directionKeys, directions } from '../utils/controlSnake.js';
+import { BOARD_ROW_LENGTH, GAME_STATE } from '../constants/constants.js';
+import {
+  directionKeys,
+  directions,
+  isSameDirection,
+  isReverseDirection,
+} from '../utils/controlSnake.js';
 import { createApple } from '../utils/createApple.js';
 
+const inititalBoardState = {
+  snakeQueue: [
+    { x: 9, y: 6 },
+    { x: 9, y: 5 },
+    { x: 9, y: 4 },
+  ],
+  direction: 0,
+};
+
 export default class Board {
-  constructor(container, initialState) {
+  constructor({ container, props }) {
     this.container = container;
-    this.state = { ...initialState, applePos: { ...createApple(initialState.snakeQueue) } };
+    this.props = props;
+    this.state = {
+      ...inititalBoardState,
+      applePos: { ...createApple(inititalBoardState.snakeQueue) },
+    };
     this.initBoard(container);
+    this.initEventListener();
     this.moveSnake();
   }
 
   setState(newState) {
     this.state = { ...this.state, ...newState };
+    console.log(this.state);
     this.render(this.container);
   }
 
@@ -58,25 +78,28 @@ export default class Board {
     container.appendChild(boardContainer);
   }
 
-  isSameDirection(key) {
-    return key === directionKeys[this.state.direction];
+  initEventListener() {
+    window.addEventListener('keyup', this.changeDirection.bind(this));
   }
 
-  isReverseDirection(key) {
-    return key === directionKeys[(this.state.direction + 2) % 4];
-  }
-
-  setDirection(e) {
+  changeDirection(e) {
     if (
+      this.props.getGameState() === GAME_STATE.BEFORE_START &&
       directionKeys.includes(e.key) &&
-      !this.isSameDirection(e.key) &&
-      !this.isReverseDirection(e.key)
-    )
+      !isReverseDirection(e.key, this.state.direction)
+    ) {
+      this.props.gameStateHandler(GAME_STATE.PLAYING);
       this.setState({ direction: directions[e.key.replace('Arrow', '')] });
-  }
+    }
 
-  changeDirection() {
-    window.addEventListener('keyup', (e) => this.setDirection(e));
+    if (
+      this.props.gameState === GAME_STATE.PLAYING &&
+      directionKeys.includes(e.key) &&
+      !isSameDirection(e.key, this.state.direction) &&
+      !isReverseDirection(e.key, this.state.direction)
+    ) {
+      this.setState({ direction: directions[e.key.replace('Arrow', '')] });
+    }
   }
 
   moveSnake() {}
