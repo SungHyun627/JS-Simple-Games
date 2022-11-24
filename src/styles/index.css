@@ -84,9 +84,28 @@ body {
   background-color: #0057FF;
 }
 
-.snake__head {
+.snake__head-Right {
   background: url('../assets/snake-head.svg');
   background-color: #ffffff;
+  transform: rotate(0deg);
+}
+
+.snake__head-Down {
+  background: url('../assets/snake-head.svg');
+  background-color: #ffffff;
+  transform: rotate(90deg);
+}
+
+.snake__head-Left {
+  background: url('../assets/snake-head.svg');
+  background-color: #ffffff;
+  transform: rotate(180deg);
+}
+
+.snake__head-Up {
+  background: url('../assets/snake-head.svg');
+  background-color: #ffffff;
+  transform: rotate(270deg);
 }
 
 .apple-icon {
