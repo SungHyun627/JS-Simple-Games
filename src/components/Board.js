@@ -69,7 +69,8 @@ export default class Board {
         if (x === rowIdx && y === colIdx) {
           cell.classList.add('snake__cell');
           if (snakeIdx === 0) {
-            cell.classList.add('snake__head');
+            cell.classList.add('snake__head-Right');
+            cell.classList.add('direction-left');
           }
         }
       });
@@ -145,6 +146,14 @@ export default class Board {
     }
   }
 
+  removeHeadClassNmae(cell) {
+    Object.keys(directions).forEach((key) => cell.classList.remove(`snake__head-${key}`));
+  }
+
+  getDirectionName(direction) {
+    return Object.keys(directions).find((key) => directions[key] === direction);
+  }
+
   render() {
     if (this.state.eventType === EVEMT_TYPES.CHANGE_DIRECTION) return;
     const headCellPos = this.state.snakeQueue[0];
@@ -156,9 +165,9 @@ export default class Board {
     const preHeadCell = this.getSnakeDomElement(preHeadCellPos);
     const removedCell = this.getSnakeDomElement(removedCellPos);
     // console.log(preHeadCell, headCell, removedCell);
-    preHeadCell.classList.remove('snake__head');
+    this.removeHeadClassNmae(preHeadCell);
     headCell.classList.add('snake__cell');
-    headCell.classList.add('snake__head');
+    headCell.classList.add(`snake__head-${this.getDirectionName(this.state.direction)}`);
 
     removedCell.classList.remove('snake__cell');
   }
