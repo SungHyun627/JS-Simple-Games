@@ -20,7 +20,8 @@ const inititalBoardState = {
     { x: 9, y: 4 },
   ],
   direction: 0,
-  removedSnakecell: null,
+  removedAppleCell: null,
+  removedSnakeCell: null,
   eventType: null,
 };
 
@@ -30,7 +31,7 @@ export default class Board {
     this.props = props;
     this.state = {
       ...inititalBoardState,
-      applePos: { ...createApple(inititalBoardState.snakeQueue) },
+      appleCell: { ...createApple(inititalBoardState.snakeQueue) },
     };
     this.initBoard();
     this.initEventListener();
@@ -39,7 +40,7 @@ export default class Board {
 
   setState(newState) {
     this.state = { ...this.state, ...newState };
-    // console.log(this.state);
+    console.log(this.state);
     this.render(this.container);
   }
 
@@ -75,7 +76,7 @@ export default class Board {
         }
       });
 
-      if (rowIdx === this.state.applePos.x && colIdx === this.state.applePos.y) {
+      if (rowIdx === this.state.appleCell.x && colIdx === this.state.appleCell.y) {
         cell.classList.add('apple__cell');
         const apple = document.createElement('img');
         apple.setAttribute('src', './src/assets/apple.svg');
@@ -129,8 +130,8 @@ export default class Board {
     setInterval(this.moveSnake.bind(this), INTERVAL_TIME);
   }
 
-  getSnakeDomElement(snakePos) {
-    return document.querySelector(`[data-row="${snakePos.x}"][data-col="${snakePos.y}"]`);
+  getCellDomElement(cell) {
+    return document.querySelector(`[data-row="${cell.x}"][data-col="${cell.y}"]`);
   }
 
   moveSnake() {
@@ -140,13 +141,25 @@ export default class Board {
       const removedCell = curQueue.pop();
       this.setState({
         snakeQueue: curQueue,
-        removedSnakecell: removedCell,
+        removedSnakeCell: removedCell,
         eventType: EVEMT_TYPES.MOVE_FORWARD,
+      });
+    }
+
+    const { x: headCellPosX, y: headCellPosY } = this.state.snakeQueue[0];
+    if (this.isSnakeGetApple(headCellPosX, headCellPosY)) {
+      console.log('good');
+      this.setState({
+        appleCell: {
+          ...createApple(this.state.snakeQueue),
+        },
+        removedAppleCell: { ...this.state.appleCell },
+        eventType: EVEMT_TYPES.GET_APPLE,
       });
     }
   }
 
-  removeHeadClassNmae(cell) {
+  removeHeadClassName(cell) {
     Object.keys(directions).forEach((key) => cell.classList.remove(`snake__head-${key}`));
   }
 
@@ -154,21 +167,40 @@ export default class Board {
     return Object.keys(directions).find((key) => directions[key] === direction);
   }
 
+  isSnakeGetApple(posX, posY) {
+    return posX === this.state.appleCell.x && posY === this.state.appleCell.y;
+  }
+
   render() {
     if (this.state.eventType === EVEMT_TYPES.CHANGE_DIRECTION) return;
-    const headCellPos = this.state.snakeQueue[0];
-    const preHeadCellPos = this.state.snakeQueue[1];
-    const removedCellPos = this.state.removedSnakecell;
-    // console.log(headCellPos, preHeadCellPos, removedCellPos);
+    const headCell = { ...this.state.snakeQueue[0] };
+    const preHeadCell = { ...this.state.snakeQueue[1] };
+    const removedCell = { ...this.state.removedSnakeCell };
+    // console.log(headCell, preHeadCell, removedCell);
 
-    const headCell = this.getSnakeDomElement(headCellPos);
-    const preHeadCell = this.getSnakeDomElement(preHeadCellPos);
-    const removedCell = this.getSnakeDomElement(removedCellPos);
+    const headCellElement = this.getCellDomElement(headCell);
+    const preHeadCellElement = this.getCellDomElement(preHeadCell);
+    const removedCellElement = this.getCellDomElement(removedCell);
     // console.log(preHeadCell, headCell, removedCell);
-    this.removeHeadClassNmae(preHeadCell);
-    headCell.classList.add('snake__cell');
-    headCell.classList.add(`snake__head-${this.getDirectionName(this.state.direction)}`);
+    this.removeHeadClassName(preHeadCellElement);
+    headCellElement.classList.add('snake__cell');
+    headCellElement.classList.add(`snake__head-${this.getDirectionName(this.state.direction)}`);
 
-    removedCell.classList.remove('snake__cell');
+    removedCellElement.classList.remove('snake__cell');
+
+    if (this.state.eventType === EVEMT_TYPES.GET_APPLE) {
+      const removedAppleCell = { ...this.state.removedAppleCell };
+      const removedAppleCellElement = this.getCellDomElement(removedAppleCell);
+      removedAppleCellElement.classList.remove('apple__cell');
+      removedAppleCellElement.removeChild(removedAppleCellElement.firstChild);
+
+      const appleCell = { ...this.state.appleCell };
+      const appleCellElement = this.getCellDomElement(appleCell);
+      appleCellElement.classList.add('apple__cell');
+      const apple = document.createElement('img');
+      apple.setAttribute('src', './src/assets/apple.svg');
+      apple.classList.add('apple-icon');
+      appleCellElement.appendChild(apple);
+    }
   }
 }

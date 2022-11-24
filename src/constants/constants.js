@@ -1,5 +1,5 @@
 export const BOARD_ROW_LENGTH = 20;
-export const INTERVAL_TIME = 100;
+export const INTERVAL_TIME = 300;
 export const GAME_STATE = {
   BEFORE_START: 'Before Start',
   PLAYING: 'Playing',
@@ -8,4 +8,5 @@ export const GAME_STATE = {
 export const EVEMT_TYPES = {
   CHANGE_DIRECTION: 'Change Direction',
   MOVE_FORWARD: 'Move Forward',
+  GET_APPLE: 'Get Apple',
 };
