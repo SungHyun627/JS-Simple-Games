@@ -23,18 +23,6 @@ export default class App {
       this.setState({ gameState: GAME_STATE.GAME_OVER });
   }
 
-  isValidStartDirection(e) {
-    return e.key !== 'ArrowLeft';
-  }
-
-  isBeforeStartGame() {
-    return this.state.gameState === GAME_STATE.BEFORE_START;
-  }
-
-  setStartDirection(e) {
-    this.setState({ gameState: GAME_STATE.PLAYING, startMoveDirection: e.key });
-  }
-
   setState(newState) {
     this.state = { ...this.state, ...newState };
     console.log(this.state);
