@@ -8,4 +8,5 @@ export const GAME_STATE = {
 export const EVEMT_TYPES = {
   CHANGE_DIRECTION: 'Change Direction',
   MOVE_FORWARD: 'Move Forward',
+  GET_APPLE: 'Get Apple',
 };
