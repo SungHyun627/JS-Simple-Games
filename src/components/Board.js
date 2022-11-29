@@ -2,7 +2,7 @@ import {
   BOARD_ROW_LENGTH,
   GAME_STATE,
   INTERVAL_TIME,
-  EVEMT_TYPES,
+  EVENT_TYPES,
 } from '../constants/constants.js';
 import {
   directionKeys,
@@ -12,8 +12,9 @@ import {
   addPos,
 } from '../utils/controlSnake.js';
 import { createApple } from '../utils/createApple.js';
+import { Scheduler } from '../utils/scheduler.js';
 
-const inititalBoardState = {
+const inititalState = {
   snakeQueue: [
     { x: 9, y: 6 },
     { x: 9, y: 5 },
@@ -23,24 +24,24 @@ const inititalBoardState = {
   removedAppleCell: null,
   removedSnakeCell: null,
   eventType: null,
+  gameState: GAME_STATE.BEFORE_START,
 };
 
 export default class Board {
-  constructor({ container, props }) {
+  constructor({ container }) {
     this.container = container;
-    this.props = props;
     this.state = {
-      ...inititalBoardState,
-      appleCell: { ...createApple(inititalBoardState.snakeQueue) },
+      ...inititalState,
+      appleCell: { ...createApple(inititalState.snakeQueue) },
     };
+    this.scheduler = new Scheduler(this.moveSnake.bind(this), INTERVAL_TIME);
     this.initBoard();
     this.initEventListener();
-    this.play();
   }
 
   setState(newState) {
     this.state = { ...this.state, ...newState };
-    console.log(this.state);
+    // console.log(this.state.gameState);
     this.render(this.container);
   }
 
@@ -94,26 +95,27 @@ export default class Board {
 
   changeDirection(e) {
     if (
-      this.props.getGameState() === GAME_STATE.BEFORE_START &&
+      this.state.gameState === GAME_STATE.BEFORE_START &&
       directionKeys.includes(e.key) &&
       !isReverseDirection(e.key, this.state.direction)
     ) {
-      this.props.gameStateHandler(GAME_STATE.PLAYING);
+      this.play();
       this.setState({
+        gameState: GAME_STATE.PLAYING,
         direction: directions[e.key.replace('Arrow', '')],
-        eventType: EVEMT_TYPES.CHANGE_DIRECTION,
+        eventType: EVENT_TYPES.CHANGE_DIRECTION,
       });
     }
 
     if (
-      this.props.getGameState() === GAME_STATE.PLAYING &&
+      this.state.gameState === GAME_STATE.PLAYING &&
       directionKeys.includes(e.key) &&
       !isSameDirection(e.key, this.state.direction) &&
       !isReverseDirection(e.key, this.state.direction)
     ) {
       this.setState({
         direction: directions[e.key.replace('Arrow', '')],
-        eventType: EVEMT_TYPES.CHANGE_DIRECTION,
+        eventType: EVENT_TYPES.CHANGE_DIRECTION,
       });
     }
   }
@@ -126,29 +128,51 @@ export default class Board {
     };
   }
 
-  play() {
-    setInterval(this.moveSnake.bind(this), INTERVAL_TIME);
-  }
-
   getCellDomElement(cell) {
     return document.querySelector(`[data-row="${cell.x}"][data-col="${cell.y}"]`);
   }
 
+  play() {
+    this.scheduler.start();
+  }
+
+  gameOver() {
+    this.scheduler.end();
+  }
+
   moveSnake() {
-    if (this.props.getGameState() === GAME_STATE.PLAYING) {
-      console.log('Move');
+    const { x: headCellPosX, y: headCellPosY } = this.state.snakeQueue[0];
+
+    if (
+      this.isOutOfRange(
+        headCellPosX + addPos[this.state.direction][0],
+        headCellPosY + addPos[this.state.direction][1]
+      )
+    ) {
+      console.log('Hit wall');
+      this.setState({ gameState: GAME_STATE.GAME_OVER, eventType: EVENT_TYPES.HIT_WALL });
+      this.gameOver();
+    }
+
+    if (
+      this.state.gameState === GAME_STATE.PLAYING &&
+      !this.isOutOfRange(
+        headCellPosX + addPos[this.state.direction][0],
+        headCellPosY + addPos[this.state.direction][1]
+      )
+    ) {
+      console.log('Move ForWard');
       const curQueue = this.state.snakeQueue.slice();
       curQueue.unshift(this.getAddedSnakeCell());
       const removedCell = curQueue.pop();
       this.setState({
         snakeQueue: curQueue.slice(),
         removedSnakeCell: removedCell,
-        eventType: EVEMT_TYPES.MOVE_FORWARD,
+        eventType: EVENT_TYPES.MOVE_FORWARD,
       });
     }
 
-    const { x: headCellPosX, y: headCellPosY } = this.state.snakeQueue[0];
-    if (this.isSnakeGetApple(headCellPosX, headCellPosY)) {
+    if (this.isSnakeGetApple(this.state.snakeQueue[0].x, this.state.snakeQueue[0].y)) {
       console.log('Get Apple');
       const curQueue = this.state.snakeQueue.slice();
       curQueue.push(this.state.removedSnakeCell);
@@ -158,7 +182,7 @@ export default class Board {
           ...createApple(this.state.snakeQueue),
         },
         removedAppleCell: { ...this.state.appleCell },
-        eventType: EVEMT_TYPES.GET_APPLE,
+        eventType: EVENT_TYPES.GET_APPLE,
       });
     }
   }
@@ -175,9 +199,13 @@ export default class Board {
     return posX === this.state.appleCell.x && posY === this.state.appleCell.y;
   }
 
+  isOutOfRange(posX, posY) {
+    return posX < 0 || posX >= BOARD_ROW_LENGTH || posY < 0 || posY >= BOARD_ROW_LENGTH;
+  }
+
   render() {
-    if (this.state.eventType === EVEMT_TYPES.CHANGE_DIRECTION) return;
-    if (this.state.eventType === EVEMT_TYPES.MOVE_FORWARD) {
+    if (this.state.eventType === EVENT_TYPES.CHANGE_DIRECTION) return;
+    if (this.state.eventType === EVENT_TYPES.MOVE_FORWARD) {
       const headCell = { ...this.state.snakeQueue[0] };
       const preHeadCell = { ...this.state.snakeQueue[1] };
       const removedCell = { ...this.state.removedSnakeCell };
@@ -194,7 +222,7 @@ export default class Board {
       removedCellElement.classList.remove('snake__cell');
     }
 
-    if (this.state.eventType === EVEMT_TYPES.GET_APPLE) {
+    if (this.state.eventType === EVENT_TYPES.GET_APPLE) {
       const removedAppleCell = { ...this.state.removedAppleCell };
       const removedAppleCellElement = this.getCellDomElement(removedAppleCell);
       removedAppleCellElement.classList.remove('apple__cell');
