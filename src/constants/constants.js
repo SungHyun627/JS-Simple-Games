@@ -1,5 +1,5 @@
 export const BOARD_ROW_LENGTH = 20;
-export const INTERVAL_TIME = 200;
+export const INTERVAL_TIME = 100;
 export const GAME_STATE = {
   BEFORE_START: 'Before Start',
   PLAYING: 'Playing',
@@ -10,4 +10,5 @@ export const EVENT_TYPES = {
   MOVE_FORWARD: 'Move Forward',
   GET_APPLE: 'Get Apple',
   HIT_WALL: 'HIT_WALL',
+  HIT_SNAKE_BODY: 'HIT_SNAKE_BODY',
 };
