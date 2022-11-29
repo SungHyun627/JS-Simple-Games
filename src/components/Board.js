@@ -11,7 +11,7 @@ import {
   isReverseDirection,
   addPos,
 } from '../utils/controlSnake.js';
-import { createApple } from '../utils/createApple.js';
+import { createApple, comparePos } from '../utils/createApple.js';
 import { Scheduler } from '../utils/scheduler.js';
 
 const inititalState = {
@@ -42,7 +42,7 @@ export default class Board {
   setState(newState) {
     this.state = { ...this.state, ...newState };
     // console.log(this.state.gameState);
-    this.render(this.container);
+    this.render();
   }
 
   initBoard() {
@@ -154,6 +154,25 @@ export default class Board {
       this.gameOver();
     }
 
+    console.log(
+      this.isHitWithSnakeBody(
+        headCellPosX + addPos[this.state.direction][0],
+        headCellPosY + addPos[this.state.direction][1],
+        this.state.snakeQueue.slice(0, -1)
+      )
+    );
+    if (
+      this.isHitWithSnakeBody(
+        headCellPosX + addPos[this.state.direction][0],
+        headCellPosY + addPos[this.state.direction][1],
+        this.state.snakeQueue.slice(0, -1)
+      )
+    ) {
+      console.log('Hit Snake Body');
+      this.setState({ gameState: GAME_STATE.GAME_OVER, eventType: EVENT_TYPES.HIT_SNAKE_BODY });
+      this.gameOver();
+    }
+
     if (
       this.state.gameState === GAME_STATE.PLAYING &&
       !this.isOutOfRange(
@@ -203,6 +222,10 @@ export default class Board {
     return posX < 0 || posX >= BOARD_ROW_LENGTH || posY < 0 || posY >= BOARD_ROW_LENGTH;
   }
 
+  isHitWithSnakeBody(posX, posY, queue) {
+    return queue.some((pos) => comparePos(pos, { x: posX, y: posY }));
+  }
+
   render() {
     if (this.state.eventType === EVENT_TYPES.CHANGE_DIRECTION) return;
     if (this.state.eventType === EVENT_TYPES.MOVE_FORWARD) {
@@ -241,6 +264,29 @@ export default class Board {
       appleCellElement.appendChild(apple);
 
       removedAppleCellElement.classList.add('snake__cell');
+    }
+
+    if (this.state.eventType === EVENT_TYPES.HIT_WALL) {
+      console.log(this.state);
+      const headCell = { ...this.state.snakeQueue[0] };
+      const headCellElement = this.getCellDomElement(headCell);
+      headCellElement.classList.remove(
+        `snake__head-${this.getDirectionName(this.state.direction)}`
+      );
+      headCellElement.classList.add(
+        `snake__head__collision-${this.getDirectionName(this.state.direction)}`
+      );
+    }
+
+    if (this.state.eventType === EVENT_TYPES.HIT_SNAKE_BODY) {
+      const headCell = { ...this.state.snakeQueue[0] };
+      const headCellElement = this.getCellDomElement(headCell);
+      headCellElement.classList.remove(
+        `snake__head-${this.getDirectionName(this.state.direction)}`
+      );
+      headCellElement.classList.add(
+        `snake__head__collision-${this.getDirectionName(this.state.direction)}`
+      );
     }
   }
 }

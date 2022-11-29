@@ -108,6 +108,30 @@ body {
   transform: rotate(270deg);
 }
 
+.snake__head__collision-Right {
+  background: url('../assets/snake-head-collision.svg');
+  background-color: #ffffff;
+  transform: rotate(0deg);
+}
+
+.snake__head__collision-Down {
+  background: url('../assets/snake-head-collision.svg');
+  background-color: #ffffff;
+  transform: rotate(90deg);
+}
+
+.snake__head__collision-Left {
+  background: url('../assets/snake-head-collision.svg');
+  background-color: #ffffff;
+  transform: rotate(180deg);
+}
+
+.snake__head__collision-Up {
+  background: url('../assets/snake-head-collision.svg');
+  background-color: #ffffff;
+  transform: rotate(270deg);
+}
+
 .apple-icon {
   width: 25px;
   height: 25px;
