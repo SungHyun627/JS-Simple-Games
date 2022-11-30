@@ -1,5 +1,6 @@
 export const BOARD_ROW_LENGTH = 20;
 export const INTERVAL_TIME = 100;
+export const INITIAL_SNAKE_LENGTH = 3;
 export const GAME_STATE = {
   BEFORE_START: 'Before Start',
   PLAYING: 'Playing',

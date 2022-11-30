@@ -1,10 +1,13 @@
 export default class ScoreBoard {
-  constructor(container) {
+  constructor({ container, ...props }) {
     this.container = container;
-    this.render(container);
+    this.props = props;
+    this.realTimeScore = 0;
+    this.bestScore = 0;
+    this.initScoreBoard();
   }
 
-  render(container) {
+  initScoreBoard() {
     const scoreBoardContainer = document.createElement('div');
     scoreBoardContainer.classList.add('score-board__container');
 
@@ -17,7 +20,7 @@ export default class ScoreBoard {
 
     const realTimeScoreText = document.createElement('div');
     realTimeScoreText.classList.add('score__text');
-    realTimeScoreText.innerHTML = 0;
+    realTimeScoreText.innerHTML = this.realTimeScore;
 
     const bestScore = document.createElement('div');
     bestScore.classList.add('best__score');
@@ -28,7 +31,7 @@ export default class ScoreBoard {
 
     const bestScoreText = document.createElement('div');
     bestScoreText.classList.add('score__text');
-    bestScoreText.innerHTML = 0;
+    bestScoreText.innerHTML = this.bestScore;
 
     realTimeScore.appendChild(realTimeScoreIcon);
     realTimeScore.appendChild(realTimeScoreText);
@@ -39,6 +42,19 @@ export default class ScoreBoard {
     scoreBoardContainer.appendChild(realTimeScore);
     scoreBoardContainer.appendChild(bestScore);
 
-    container.appendChild(scoreBoardContainer);
+    this.container.appendChild(scoreBoardContainer);
+  }
+
+  render() {
+    const realTimeScoreTextElement = document.querySelector('.realtime__score .score__text');
+    const bestScoreTextElement = document.querySelector('.best__score .score__text');
+    console.log(realTimeScoreTextElement, bestScoreTextElement);
+    realTimeScoreTextElement.innerHTML = this.realTimeScore;
+    bestScoreTextElement.innerHTML = this.bestScore;
+  }
+
+  printRealTimeScore(score) {
+    this.realTimeScore = score;
+    this.render();
   }
 }

@@ -3,6 +3,7 @@ import {
   GAME_STATE,
   INTERVAL_TIME,
   EVENT_TYPES,
+  INITIAL_SNAKE_LENGTH,
 } from '../constants/constants.js';
 import {
   directionKeys,
@@ -28,12 +29,13 @@ const inititalState = {
 };
 
 export default class Board {
-  constructor({ container }) {
+  constructor({ container, ...props }) {
     this.container = container;
     this.state = {
       ...inititalState,
       appleCell: { ...createApple(inititalState.snakeQueue) },
     };
+    this.props = props;
     this.scheduler = new Scheduler(this.moveSnake.bind(this), INTERVAL_TIME);
     this.initBoard();
     this.initEventListener();
@@ -149,18 +151,11 @@ export default class Board {
         headCellPosY + addPos[this.state.direction][1]
       )
     ) {
-      console.log('Hit wall');
+      // console.log('Hit wall');
       this.setState({ gameState: GAME_STATE.GAME_OVER, eventType: EVENT_TYPES.HIT_WALL });
       this.gameOver();
     }
 
-    console.log(
-      this.isHitWithSnakeBody(
-        headCellPosX + addPos[this.state.direction][0],
-        headCellPosY + addPos[this.state.direction][1],
-        this.state.snakeQueue.slice(0, -1)
-      )
-    );
     if (
       this.isHitWithSnakeBody(
         headCellPosX + addPos[this.state.direction][0],
@@ -168,7 +163,7 @@ export default class Board {
         this.state.snakeQueue.slice(0, -1)
       )
     ) {
-      console.log('Hit Snake Body');
+      // console.log('Hit Snake Body');
       this.setState({ gameState: GAME_STATE.GAME_OVER, eventType: EVENT_TYPES.HIT_SNAKE_BODY });
       this.gameOver();
     }
@@ -180,7 +175,7 @@ export default class Board {
         headCellPosY + addPos[this.state.direction][1]
       )
     ) {
-      console.log('Move ForWard');
+      // console.log('Move ForWard');
       const curQueue = this.state.snakeQueue.slice();
       curQueue.unshift(this.getAddedSnakeCell());
       const removedCell = curQueue.pop();
@@ -203,6 +198,7 @@ export default class Board {
         removedAppleCell: { ...this.state.appleCell },
         eventType: EVENT_TYPES.GET_APPLE,
       });
+      this.props.getRealTimeScore();
     }
   }
 
@@ -224,6 +220,10 @@ export default class Board {
 
   isHitWithSnakeBody(posX, posY, queue) {
     return queue.some((pos) => comparePos(pos, { x: posX, y: posY }));
+  }
+
+  getScore() {
+    return this.state.snakeQueue.length - INITIAL_SNAKE_LENGTH;
   }
 
   render() {
@@ -267,7 +267,6 @@ export default class Board {
     }
 
     if (this.state.eventType === EVENT_TYPES.HIT_WALL) {
-      console.log(this.state);
       const headCell = { ...this.state.snakeQueue[0] };
       const headCellElement = this.getCellDomElement(headCell);
       headCellElement.classList.remove(
