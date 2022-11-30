@@ -6,12 +6,10 @@ export class Scheduler {
   }
 
   start() {
-    console.log('start');
     this.id = setInterval(this.callback, this.delay);
   }
 
   end() {
-    console.log('end');
     clearInterval(this.id);
   }
 }

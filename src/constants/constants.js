@@ -12,4 +12,5 @@ export const EVENT_TYPES = {
   GET_APPLE: 'Get Apple',
   HIT_WALL: 'HIT_WALL',
   HIT_SNAKE_BODY: 'HIT_SNAKE_BODY',
+  RESTART_GAME: 'RESTART_GAME',
 };

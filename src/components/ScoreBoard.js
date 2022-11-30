@@ -45,6 +45,11 @@ export default class ScoreBoard {
     this.container.appendChild(scoreBoardContainer);
   }
 
+  init() {
+    this.realTimeScore = 0;
+    this.render();
+  }
+
   render() {
     const realTimeScoreTextElement = document.querySelector('.realtime__score .score__text');
     const bestScoreTextElement = document.querySelector('.best__score .score__text');
