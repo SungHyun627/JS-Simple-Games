@@ -1,24 +1,26 @@
 export default class ControlBoard {
-  constructor(container) {
+  constructor({ container, ...props }) {
     this.container = container;
-    this.render(container);
+    this.props = props;
+    this.render();
   }
 
-  render(container) {
+  render() {
     const controlBoardContainer = document.createElement('div');
     controlBoardContainer.classList.add('control-board__container');
 
-    const reStartButton = document.createElement('button');
-    reStartButton.classList.add('restart__btn');
-    reStartButton.innerHTML = 'Restart';
+    const restartBtn = document.createElement('button');
+    restartBtn.classList.add('restart__btn');
+    restartBtn.innerHTML = 'Restart';
+    restartBtn.addEventListener('click', () => this.props.restartGame());
 
-    const resetButton = document.createElement('button');
-    resetButton.classList.add('reset__btn');
-    resetButton.innerHTML = 'Reset';
+    const resetBtn = document.createElement('button');
+    resetBtn.classList.add('reset__btn');
+    resetBtn.innerHTML = 'Reset';
 
-    controlBoardContainer.appendChild(reStartButton);
-    controlBoardContainer.appendChild(resetButton);
+    controlBoardContainer.appendChild(restartBtn);
+    controlBoardContainer.appendChild(resetBtn);
 
-    container.appendChild(controlBoardContainer);
+    this.container.appendChild(controlBoardContainer);
   }
 }

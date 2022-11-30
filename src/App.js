@@ -24,13 +24,16 @@ export default class App {
     this.gameTtile = new GameTitle(pageContainer);
     this.scoreBoard = new ScoreBoard({
       container: pageContainer,
-      setRealTimeScore: () => this.#setScore,
+      setRealTimeScore: () => this.#setScore(),
     });
     this.board = new Board({
       container: pageContainer,
       getRealTimeScore: () => this.#getRealTimeScore(),
     });
-    this.controlBoard = new ControlBoard(pageContainer);
+    this.controlBoard = new ControlBoard({
+      container: pageContainer,
+      restartGame: () => this.#restartGame(),
+    });
     this.modal = new Modal(pageContainer);
     this.container.appendChild(pageContainer);
   }
@@ -41,5 +44,10 @@ export default class App {
 
   #setScore(realtimeScore) {
     return this.scoreBoard.printScore(realtimeScore);
+  }
+
+  #restartGame() {
+    this.board.init();
+    this.scoreBoard.init();
   }
 }
