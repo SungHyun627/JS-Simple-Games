@@ -17,6 +17,7 @@ export default class ControlBoard {
     const resetBtn = document.createElement('button');
     resetBtn.classList.add('reset__btn');
     resetBtn.innerHTML = 'Reset';
+    resetBtn.addEventListener('click', () => this.props.resetGame());
 
     controlBoardContainer.appendChild(restartBtn);
     controlBoardContainer.appendChild(resetBtn);
