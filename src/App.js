@@ -24,7 +24,7 @@ export default class App {
     this.gameTtile = new GameTitle(pageContainer);
     this.scoreBoard = new ScoreBoard({
       container: pageContainer,
-      setRealTimeScore: () => this.#setRealTimeScore,
+      setRealTimeScore: () => this.#setScore,
     });
     this.board = new Board({
       container: pageContainer,
@@ -36,10 +36,10 @@ export default class App {
   }
 
   #getRealTimeScore() {
-    return this.#setRealTimeScore(this.board.getScore());
+    return this.#setScore(this.board.getScore());
   }
 
-  #setRealTimeScore(realtimeScore) {
-    return this.scoreBoard.printRealTimeScore(realtimeScore);
+  #setScore(realtimeScore) {
+    return this.scoreBoard.printScore(realtimeScore);
   }
 }

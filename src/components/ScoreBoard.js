@@ -3,7 +3,7 @@ export default class ScoreBoard {
     this.container = container;
     this.props = props;
     this.realTimeScore = 0;
-    this.bestScore = 0;
+    this.bestScore = this.getBestScoreSession();
     this.initScoreBoard();
   }
 
@@ -48,13 +48,31 @@ export default class ScoreBoard {
   render() {
     const realTimeScoreTextElement = document.querySelector('.realtime__score .score__text');
     const bestScoreTextElement = document.querySelector('.best__score .score__text');
-    console.log(realTimeScoreTextElement, bestScoreTextElement);
+    // console.log(realTimeScoreTextElement, bestScoreTextElement);
     realTimeScoreTextElement.innerHTML = this.realTimeScore;
     bestScoreTextElement.innerHTML = this.bestScore;
   }
 
-  printRealTimeScore(score) {
+  printScore(score) {
     this.realTimeScore = score;
+    if (this.isRealTimeScoreBiggerThanBestScore()) {
+      this.bestScore = score;
+      this.setBestScoreSession(score);
+    }
     this.render();
+  }
+
+  setBestScoreSession(bestScore) {
+    sessionStorage.setItem('bestScore', bestScore);
+  }
+
+  getBestScoreSession() {
+    const bestScore = sessionStorage.getItem('bestScore');
+    if (bestScore === null) this.setBestScoreSession(0);
+    return bestScore !== null ? bestScore : 0;
+  }
+
+  isRealTimeScoreBiggerThanBestScore() {
+    return this.realTimeScore > this.bestScore;
   }
 }
