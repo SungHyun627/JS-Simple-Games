@@ -33,6 +33,7 @@ export default class App {
     this.controlBoard = new ControlBoard({
       container: pageContainer,
       restartGame: () => this.#restartGame(),
+      resetGame: () => this.#resetGame(),
     });
     this.modal = new Modal(pageContainer);
     this.container.appendChild(pageContainer);
@@ -47,6 +48,11 @@ export default class App {
   }
 
   #restartGame() {
+    this.board.init();
+    this.scoreBoard.resetRealTimeScore();
+  }
+
+  #resetGame() {
     this.board.init();
     this.scoreBoard.init();
   }

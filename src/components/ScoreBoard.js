@@ -2,8 +2,7 @@ export default class ScoreBoard {
   constructor({ container, ...props }) {
     this.container = container;
     this.props = props;
-    this.realTimeScore = 0;
-    this.bestScore = this.getBestScoreSession();
+    this.state = { realTimeScore: 0, bestScore: this.getBestScoreSession() };
     this.initScoreBoard();
   }
 
@@ -20,7 +19,7 @@ export default class ScoreBoard {
 
     const realTimeScoreText = document.createElement('div');
     realTimeScoreText.classList.add('score__text');
-    realTimeScoreText.innerHTML = this.realTimeScore;
+    realTimeScoreText.innerHTML = this.state.realTimeScore;
 
     const bestScore = document.createElement('div');
     bestScore.classList.add('best__score');
@@ -31,7 +30,7 @@ export default class ScoreBoard {
 
     const bestScoreText = document.createElement('div');
     bestScoreText.classList.add('score__text');
-    bestScoreText.innerHTML = this.bestScore;
+    bestScoreText.innerHTML = this.state.bestScore;
 
     realTimeScore.appendChild(realTimeScoreIcon);
     realTimeScore.appendChild(realTimeScoreText);
@@ -45,26 +44,35 @@ export default class ScoreBoard {
     this.container.appendChild(scoreBoardContainer);
   }
 
-  init() {
-    this.realTimeScore = 0;
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
     this.render();
+  }
+
+  init() {
+    this.setState({ realTimeScore: 0, bestScore: 0 });
+    this.setBestScoreSession(0);
+  }
+
+  resetRealTimeScore() {
+    this.setState({ realTimeScore: 0 });
   }
 
   render() {
     const realTimeScoreTextElement = document.querySelector('.realtime__score .score__text');
     const bestScoreTextElement = document.querySelector('.best__score .score__text');
     // console.log(realTimeScoreTextElement, bestScoreTextElement);
-    realTimeScoreTextElement.innerHTML = this.realTimeScore;
-    bestScoreTextElement.innerHTML = this.bestScore;
+    realTimeScoreTextElement.innerHTML = this.state.realTimeScore;
+    bestScoreTextElement.innerHTML = this.state.bestScore;
   }
 
   printScore(score) {
-    this.realTimeScore = score;
-    if (this.isRealTimeScoreBiggerThanBestScore()) {
-      this.bestScore = score;
+    if (this.isRealTimeScoreBiggerThanBestScore(score)) {
+      this.setState({ realTimeScore: score, bestScore: score });
       this.setBestScoreSession(score);
+    } else {
+      this.setState({ realTimeScore: score });
     }
-    this.render();
   }
 
   setBestScoreSession(bestScore) {
@@ -77,7 +85,7 @@ export default class ScoreBoard {
     return bestScore !== null ? bestScore : 0;
   }
 
-  isRealTimeScoreBiggerThanBestScore() {
-    return this.realTimeScore > this.bestScore;
+  isRealTimeScoreBiggerThanBestScore(score) {
+    return score > this.state.bestScore;
   }
 }
