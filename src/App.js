@@ -7,19 +7,39 @@ import Modal from './components/Modal.js';
 export default class App {
   constructor(container) {
     this.container = container;
+    this.init();
     this.render();
+  }
+
+  init() {
+    this.gameTitleComponent = '';
+    this.scoreBoard = '';
+    this.board = '';
+    this.controlBoard = '';
   }
 
   render() {
     const pageContainer = document.createElement('div');
     pageContainer.classList.add('page__container');
-    new GameTitle(pageContainer);
-    new ScoreBoard(pageContainer);
-    new Board({
+    this.gameTtile = new GameTitle(pageContainer);
+    this.scoreBoard = new ScoreBoard({
       container: pageContainer,
+      setRealTimeScore: () => this.#setRealTimeScore,
     });
-    new ControlBoard(pageContainer);
-    new Modal(pageContainer);
+    this.board = new Board({
+      container: pageContainer,
+      getRealTimeScore: () => this.#getRealTimeScore(),
+    });
+    this.controlBoard = new ControlBoard(pageContainer);
+    this.modal = new Modal(pageContainer);
     this.container.appendChild(pageContainer);
+  }
+
+  #getRealTimeScore() {
+    return this.#setRealTimeScore(this.board.getScore());
+  }
+
+  #setRealTimeScore(realtimeScore) {
+    return this.scoreBoard.printRealTimeScore(realtimeScore);
   }
 }
