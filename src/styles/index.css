@@ -31,7 +31,7 @@ body {
   color: #ffffff;
 }
 
-.score-board__container {
+.scoreboard__container {
   display: flex;
   margin: 10px 0;
   width: 70%;
@@ -55,7 +55,7 @@ body {
   margin-right: 10px;
 }
 
-.score__text {
+.scoreboard__score__text {
   width: 70px;
   font-size: 30px;
   color: #ffffff;
@@ -162,17 +162,43 @@ body {
   background-color: #0057FF;
 }
 
-.modal__container {
+.modal__container-hidden {
   display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
   flex-direction: column;
   align-items: center;
   background-color: #0E768D;
-  padding: 80px 100px;
+  transform: translate(-50%, -50%);
+  padding: 40px 60px;
+  opacity: 80%;
+}
+
+.modal__container-show {
+  display: flex;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  flex-direction: column;
+  align-items: center;
+  background-color: #0E768D;
+  transform: translate(-50%, -50%);
+  padding: 40px 60px;
+  opacity: 80%;
+}
+
+
+.modal__snake__icon {
+  width: 70px;
 }
 
 .modal__gameover__text {
-  font-size: 70px;
+  font-size: 50px;
   font-weight: bold;
+  margin: 10px 0;
 }
 
 .modal__score__result {
@@ -180,8 +206,20 @@ body {
   text-align: center;
 }
 
+.modal__best__score, .modal__realtime__score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .modal__score__result img {
   margin: 10px 40px;
+}
+
+.modal__score__text {
+  width: 70px;
+  font-size: 30px;
+  color: #ffffff;
 }
 
 .modal__control__btns {
@@ -197,7 +235,7 @@ body {
   padding: 10px 30px;
   border: none;
   border-radius: 20px;
-  font-size: 60px;
+  font-size: 40px;
   color: #fff;
   font-style: italic;
 }

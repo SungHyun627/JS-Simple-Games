@@ -1,12 +1,20 @@
 export default class Modal {
-  constructor(container) {
+  constructor({ container, props }) {
     this.container = container;
-    this.render(container);
+    this.state = { showModal: false };
+    this.props = props;
+    this.initModal();
   }
 
-  render(container) {
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
+    console.log(this.state);
+    this.render();
+  }
+
+  initModal() {
     const modalConatiner = document.createElement('div');
-    modalConatiner.classList.add('modal__container');
+    modalConatiner.classList.add('modal__container-hidden');
 
     const modalSnakeIcon = document.createElement('img');
     modalSnakeIcon.classList.add('modal__snake__icon');
@@ -27,7 +35,7 @@ export default class Modal {
     modalRealTimeScoreIcon.setAttribute('src', 'src/assets/apple.svg');
 
     const modalRealTimeScoreText = document.createElement('div');
-    modalRealTimeScoreText.classList.add('score__text');
+    modalRealTimeScoreText.classList.add('modal__score__text');
     modalRealTimeScoreText.innerHTML = 1000;
 
     modalRealTimeScore.appendChild(modalRealTimeScoreIcon);
@@ -41,7 +49,7 @@ export default class Modal {
     modalBestScoreIcon.setAttribute('src', 'src/assets/trophy.svg');
 
     const modalBestScoreText = document.createElement('div');
-    modalBestScoreText.classList.add('score__text');
+    modalBestScoreText.classList.add('modal__score__text');
     modalBestScoreText.innerHTML = 1000;
 
     modalBestScore.appendChild(modalBestScoreIcon);
@@ -69,6 +77,25 @@ export default class Modal {
     modalConatiner.appendChild(modalScoreResult);
     modalConatiner.appendChild(modalControlButtons);
 
-    container.appendChild(modalConatiner);
+    this.container.appendChild(modalConatiner);
   }
+
+  render() {
+    if (this.state.showModal) {
+      const modalConatinerDomElement = document.querySelector('.modal__container-hidden');
+      modalConatinerDomElement.classList.remove('modal__container-hidden');
+      modalConatinerDomElement.classList.add('modal__container-show');
+    }
+    if (!this.state.showModal) {
+      const modalConatinerDomElement = document.querySelector('.modal__container-show');
+      modalConatinerDomElement.classList.remove('.modal__container-show');
+      modalConatinerDomElement.classList.add('modal__container-hidden');
+    }
+  }
+
+  showModal() {
+    this.setState({ showModal: true });
+  }
+
+  closeModal() {}
 }

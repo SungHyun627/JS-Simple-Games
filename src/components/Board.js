@@ -149,8 +149,13 @@ export default class Board {
     this.scheduler.start();
   }
 
+  getGameState() {
+    return this.state.gameState;
+  }
+
   gameOver() {
     this.scheduler.end();
+    this.props.showModal();
   }
 
   moveSnake() {
