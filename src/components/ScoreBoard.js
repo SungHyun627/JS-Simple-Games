@@ -8,7 +8,7 @@ export default class ScoreBoard {
 
   initScoreBoard() {
     const scoreBoardContainer = document.createElement('div');
-    scoreBoardContainer.classList.add('score-board__container');
+    scoreBoardContainer.classList.add('scoreboard__container');
 
     const realTimeScore = document.createElement('div');
     realTimeScore.classList.add('realtime__score');
@@ -18,7 +18,7 @@ export default class ScoreBoard {
     realTimeScoreIcon.setAttribute('src', 'src/assets/apple.svg');
 
     const realTimeScoreText = document.createElement('div');
-    realTimeScoreText.classList.add('score__text');
+    realTimeScoreText.classList.add('scoreboard__score__text');
     realTimeScoreText.innerHTML = this.state.realTimeScore;
 
     const bestScore = document.createElement('div');
@@ -29,7 +29,7 @@ export default class ScoreBoard {
     bestScoreIcon.setAttribute('src', 'src/assets/trophy.svg');
 
     const bestScoreText = document.createElement('div');
-    bestScoreText.classList.add('score__text');
+    bestScoreText.classList.add('scoreboard__score__text');
     bestScoreText.innerHTML = this.state.bestScore;
 
     realTimeScore.appendChild(realTimeScoreIcon);
@@ -59,14 +59,17 @@ export default class ScoreBoard {
   }
 
   render() {
-    const realTimeScoreTextElement = document.querySelector('.realtime__score .score__text');
-    const bestScoreTextElement = document.querySelector('.best__score .score__text');
+    const realTimeScoreTextElement = document.querySelector(
+      '.realtime__score .scoreboard__score__text'
+    );
+    const bestScoreTextElement = document.querySelector('.best__score .scoreboard__score__text');
     // console.log(realTimeScoreTextElement, bestScoreTextElement);
     realTimeScoreTextElement.innerHTML = this.state.realTimeScore;
     bestScoreTextElement.innerHTML = this.state.bestScore;
   }
 
   printScore(score) {
+    console.log(score);
     if (this.isRealTimeScoreBiggerThanBestScore(score)) {
       this.setState({ realTimeScore: score, bestScore: score });
       this.setBestScoreSession(score);

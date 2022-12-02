@@ -3,6 +3,7 @@ import ScoreBoard from './components/ScoreBoard.js';
 import Board from './components/Board.js';
 import ControlBoard from './components/ControlBoard.js';
 import Modal from './components/Modal.js';
+import { GAME_STATE } from './constants/constants.js';
 
 export default class App {
   constructor(container) {
@@ -16,6 +17,7 @@ export default class App {
     this.scoreBoard = '';
     this.board = '';
     this.controlBoard = '';
+    this.modal = '';
   }
 
   render() {
@@ -24,28 +26,37 @@ export default class App {
     this.gameTtile = new GameTitle(pageContainer);
     this.scoreBoard = new ScoreBoard({
       container: pageContainer,
-      setRealTimeScore: () => this.#setScore(),
+      setRealTimeScore: () => this.#setScoreBoardRealTimeScore(),
     });
     this.board = new Board({
       container: pageContainer,
       getRealTimeScore: () => this.#getRealTimeScore(),
+      showModal: () => this.#showModal(),
+      isGameOver: () => this.#isGameOver(),
     });
     this.controlBoard = new ControlBoard({
       container: pageContainer,
       restartGame: () => this.#restartGame(),
       resetGame: () => this.#resetGame(),
     });
-    this.modal = new Modal(pageContainer);
     this.container.appendChild(pageContainer);
+    this.modal = new Modal({ container: this.container });
+  }
+
+  #isGameOver() {
+    return this.board.getGameState() === GAME_STATE.GAME_OVER;
   }
 
   #getRealTimeScore() {
-    return this.#setScore(this.board.getScore());
+    const realTimeScore = this.board.getScore();
+    this.#setScoreBoardRealTimeScore(realTimeScore);
   }
 
-  #setScore(realtimeScore) {
-    return this.scoreBoard.printScore(realtimeScore);
+  #setScoreBoardRealTimeScore(realTimeScore) {
+    return this.scoreBoard.printScore(realTimeScore);
   }
+
+  #setModalScore() {}
 
   #restartGame() {
     this.board.init();
@@ -55,5 +66,13 @@ export default class App {
   #resetGame() {
     this.board.init();
     this.scoreBoard.init();
+  }
+
+  #showModal() {
+    this.modal.showModal();
+  }
+
+  #closeModal() {
+    this.modal.closeModal();
   }
 }
