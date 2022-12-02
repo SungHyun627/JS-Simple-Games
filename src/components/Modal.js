@@ -8,7 +8,6 @@ export default class Modal {
 
   setState(newState) {
     this.state = { ...this.state, ...newState };
-    console.log(this.state);
     this.render();
   }
 
@@ -35,8 +34,9 @@ export default class Modal {
     modalRealTimeScoreIcon.setAttribute('src', 'src/assets/apple.svg');
 
     const modalRealTimeScoreText = document.createElement('div');
-    modalRealTimeScoreText.classList.add('modal__score__text');
-    modalRealTimeScoreText.innerHTML = 1000;
+    modalRealTimeScoreText.classList.add('modal__realtime__score__text');
+
+    modalRealTimeScoreText.innerHTML = 0;
 
     modalRealTimeScore.appendChild(modalRealTimeScoreIcon);
     modalRealTimeScore.appendChild(modalRealTimeScoreText);
@@ -49,8 +49,8 @@ export default class Modal {
     modalBestScoreIcon.setAttribute('src', 'src/assets/trophy.svg');
 
     const modalBestScoreText = document.createElement('div');
-    modalBestScoreText.classList.add('modal__score__text');
-    modalBestScoreText.innerHTML = 1000;
+    modalBestScoreText.classList.add('modal__best__score__text');
+    modalBestScoreText.innerHTML = 0;
 
     modalBestScore.appendChild(modalBestScoreIcon);
     modalBestScore.appendChild(modalBestScoreText);
@@ -94,7 +94,15 @@ export default class Modal {
   }
 
   showModal() {
+    // this.setScore();
     this.setState({ showModal: true });
+  }
+
+  setScore(realtimeScore) {
+    const modalRealTimeScoreTextElement = document.querySelector('.modal__realtime__score__text');
+    const modalBestScoreTextElement = document.querySelector('.modal__best__score__text');
+    modalRealTimeScoreTextElement.innerHTML = realtimeScore;
+    modalBestScoreTextElement.innerHTML = sessionStorage.getItem('bestScore');
   }
 
   closeModal() {}
