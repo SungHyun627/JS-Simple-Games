@@ -54,8 +54,9 @@ export default class Board {
       appleCell: { ...createApple(inititalState.snakeQueue) },
       eventType: EVENT_TYPES.RESTART_GAME,
       removedAppleCell: { ...this.state.appleCell },
+      gameState: GAME_STATE.BEFORE_START,
     });
-    this.gameOver();
+    this.scheduler.end();
   }
 
   initBoard() {
