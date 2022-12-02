@@ -1,7 +1,9 @@
+import { MODAL_STATE } from '../constants/constants.js';
+
 export default class Modal {
   constructor({ container, props }) {
     this.container = container;
-    this.state = { showModal: false };
+    this.state = { modalState: MODAL_STATE.HIDDEN };
     this.props = props;
     this.initModal();
   }
@@ -14,6 +16,10 @@ export default class Modal {
   initModal() {
     const modalConatiner = document.createElement('div');
     modalConatiner.classList.add('modal__container-hidden');
+
+    const modalCloseButton = document.createElement('img');
+    modalCloseButton.classList.add('modal__close__icon');
+    modalCloseButton.setAttribute('src', 'src/assets/close-icon.svg');
 
     const modalSnakeIcon = document.createElement('img');
     modalSnakeIcon.classList.add('modal__snake__icon');
@@ -64,6 +70,7 @@ export default class Modal {
     const modalRestartButton = document.createElement('button');
     modalRestartButton.classList.add('modal__restart__btn');
     modalRestartButton.innerHTML = 'Restart Game';
+    // modalRestartButton.addEventListener('clck')
 
     const modalStopPlayingButton = document.createElement('button');
     modalStopPlayingButton.classList.add('modal__stopplaying__btn');
@@ -72,6 +79,7 @@ export default class Modal {
     modalControlButtons.appendChild(modalRestartButton);
     modalControlButtons.appendChild(modalStopPlayingButton);
 
+    modalConatiner.appendChild(modalCloseButton);
     modalConatiner.appendChild(modalSnakeIcon);
     modalConatiner.appendChild(modalGameOverText);
     modalConatiner.appendChild(modalScoreResult);
@@ -81,21 +89,20 @@ export default class Modal {
   }
 
   render() {
-    if (this.state.showModal) {
+    if (this.state.modalState === MODAL_STATE.SHOW) {
       const modalConatinerDomElement = document.querySelector('.modal__container-hidden');
       modalConatinerDomElement.classList.remove('modal__container-hidden');
       modalConatinerDomElement.classList.add('modal__container-show');
     }
-    if (!this.state.showModal) {
+    if (this.state.modalState === MODAL_STATE.HIDDEN) {
       const modalConatinerDomElement = document.querySelector('.modal__container-show');
-      modalConatinerDomElement.classList.remove('.modal__container-show');
+      modalConatinerDomElement.classList.remove('modal__container-show');
       modalConatinerDomElement.classList.add('modal__container-hidden');
     }
   }
 
   showModal() {
-    // this.setScore();
-    this.setState({ showModal: true });
+    this.setState({ modalState: MODAL_STATE.SHOW });
   }
 
   setScore(realtimeScore) {
@@ -105,5 +112,7 @@ export default class Modal {
     modalBestScoreTextElement.innerHTML = sessionStorage.getItem('bestScore');
   }
 
-  closeModal() {}
+  closeModal() {
+    this.setState({ modalState: MODAL_STATE.HIDDEN });
+  }
 }

@@ -42,7 +42,6 @@ export default class App {
   }
 
   #setScoreInScoreBoard(realTimeScore) {
-    console.log(realTimeScore);
     return this.scoreBoard.setScore(realTimeScore);
   }
 

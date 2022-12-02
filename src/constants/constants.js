@@ -6,6 +6,12 @@ export const GAME_STATE = {
   PLAYING: 'Playing',
   GAME_OVER: 'GameOver',
 };
+
+export const MODAL_STATE = {
+  HIDDEN: 'Hidden',
+  SHOW: 'Show',
+};
+
 export const EVENT_TYPES = {
   CHANGE_DIRECTION: 'Change Direction',
   MOVE_FORWARD: 'Move Forward',
