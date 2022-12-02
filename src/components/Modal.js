@@ -14,12 +14,13 @@ export default class Modal {
   }
 
   initModal() {
+    window.addEventListener('keyup', this.closeModalWithEscapeKey.bind(this));
     const modalConatiner = document.createElement('div');
     modalConatiner.classList.add('modal__container-hidden');
-
     const modalCloseButton = document.createElement('img');
     modalCloseButton.classList.add('modal__close__icon');
     modalCloseButton.setAttribute('src', 'src/assets/close-icon.svg');
+    modalCloseButton.addEventListener('click', this.closeModal.bind(this));
 
     const modalSnakeIcon = document.createElement('img');
     modalSnakeIcon.classList.add('modal__snake__icon');
@@ -70,11 +71,11 @@ export default class Modal {
     const modalRestartButton = document.createElement('button');
     modalRestartButton.classList.add('modal__restart__btn');
     modalRestartButton.innerHTML = 'Restart Game';
-    // modalRestartButton.addEventListener('clck')
 
     const modalStopPlayingButton = document.createElement('button');
     modalStopPlayingButton.classList.add('modal__stopplaying__btn');
     modalStopPlayingButton.innerHTML = 'Stop Playing';
+    modalStopPlayingButton.addEventListener('click', this.closeModal.bind(this));
 
     modalControlButtons.appendChild(modalRestartButton);
     modalControlButtons.appendChild(modalStopPlayingButton);
@@ -110,6 +111,11 @@ export default class Modal {
     const modalBestScoreTextElement = document.querySelector('.modal__best__score__text');
     modalRealTimeScoreTextElement.innerHTML = realtimeScore;
     modalBestScoreTextElement.innerHTML = sessionStorage.getItem('bestScore');
+  }
+
+  closeModalWithEscapeKey(e) {
+    if (this.state.modalState === MODAL_STATE.HIDDEN) return;
+    if (e.key === 'Escape') this.closeModal();
   }
 
   closeModal() {
