@@ -1,7 +1,7 @@
 import { MODAL_STATE } from '../constants/constants.js';
 
 export default class Modal {
-  constructor({ container, props }) {
+  constructor({ container, ...props }) {
     this.container = container;
     this.state = { modalState: MODAL_STATE.HIDDEN };
     this.props = props;
@@ -71,6 +71,7 @@ export default class Modal {
     const modalRestartButton = document.createElement('button');
     modalRestartButton.classList.add('modal__restart__btn');
     modalRestartButton.innerHTML = 'Restart Game';
+    modalRestartButton.addEventListener('click', this.closeModalForRestartGame.bind(this));
 
     const modalStopPlayingButton = document.createElement('button');
     modalStopPlayingButton.classList.add('modal__stopplaying__btn');
@@ -113,12 +114,17 @@ export default class Modal {
     modalBestScoreTextElement.innerHTML = sessionStorage.getItem('bestScore');
   }
 
+  closeModal() {
+    this.setState({ modalState: MODAL_STATE.HIDDEN });
+  }
+
   closeModalWithEscapeKey(e) {
     if (this.state.modalState === MODAL_STATE.HIDDEN) return;
     if (e.key === 'Escape') this.closeModal();
   }
 
-  closeModal() {
-    this.setState({ modalState: MODAL_STATE.HIDDEN });
+  closeModalForRestartGame() {
+    this.closeModal();
+    this.props.restartGame();
   }
 }
