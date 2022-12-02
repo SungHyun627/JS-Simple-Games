@@ -216,7 +216,7 @@ body {
   margin: 10px 40px;
 }
 
-.modal__score__text {
+.modal__best__score__text, .modal__realtime__score__text {
   width: 70px;
   font-size: 30px;
   color: #ffffff;

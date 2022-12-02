@@ -3,7 +3,6 @@ import ScoreBoard from './components/ScoreBoard.js';
 import Board from './components/Board.js';
 import ControlBoard from './components/ControlBoard.js';
 import Modal from './components/Modal.js';
-import { GAME_STATE } from './constants/constants.js';
 
 export default class App {
   constructor(container) {
@@ -26,13 +25,12 @@ export default class App {
     this.gameTtile = new GameTitle(pageContainer);
     this.scoreBoard = new ScoreBoard({
       container: pageContainer,
-      setRealTimeScore: () => this.#setScoreBoardRealTimeScore(),
     });
     this.board = new Board({
       container: pageContainer,
-      getRealTimeScore: () => this.#getRealTimeScore(),
       showModal: () => this.#showModal(),
-      isGameOver: () => this.#isGameOver(),
+      setScoreInScoreBoard: (realTimeScore) => this.#setScoreInScoreBoard(realTimeScore),
+      setScoreInModal: (realTimeScore) => this.#setScoreInModal(realTimeScore),
     });
     this.controlBoard = new ControlBoard({
       container: pageContainer,
@@ -43,20 +41,14 @@ export default class App {
     this.modal = new Modal({ container: this.container });
   }
 
-  #isGameOver() {
-    return this.board.getGameState() === GAME_STATE.GAME_OVER;
+  #setScoreInScoreBoard(realTimeScore) {
+    console.log(realTimeScore);
+    return this.scoreBoard.setScore(realTimeScore);
   }
 
-  #getRealTimeScore() {
-    const realTimeScore = this.board.getScore();
-    this.#setScoreBoardRealTimeScore(realTimeScore);
+  #setScoreInModal(realTimeScore) {
+    return this.modal.setScore(realTimeScore);
   }
-
-  #setScoreBoardRealTimeScore(realTimeScore) {
-    return this.scoreBoard.printScore(realTimeScore);
-  }
-
-  #setModalScore() {}
 
   #restartGame() {
     this.board.init();

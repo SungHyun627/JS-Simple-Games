@@ -156,7 +156,13 @@ export default class Board {
 
   gameOver() {
     this.scheduler.end();
+    const realTimeScore = this.getScore();
+    this.props.setScoreInModal(realTimeScore);
     this.props.showModal();
+  }
+
+  isGameOver() {
+    return this.state.gameState === GAME_STATE.gameOver;
   }
 
   moveSnake() {
@@ -215,7 +221,8 @@ export default class Board {
         removedAppleCell: { ...this.state.appleCell },
         eventType: EVENT_TYPES.GET_APPLE,
       });
-      this.props.getRealTimeScore();
+      const realTimeScore = this.getScore();
+      this.props.setScoreInScoreBoard(realTimeScore);
     }
   }
 

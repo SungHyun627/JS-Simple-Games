@@ -68,8 +68,7 @@ export default class ScoreBoard {
     bestScoreTextElement.innerHTML = this.state.bestScore;
   }
 
-  printScore(score) {
-    console.log(score);
+  setScore(score) {
     if (this.isRealTimeScoreBiggerThanBestScore(score)) {
       this.setState({ realTimeScore: score, bestScore: score });
       this.setBestScoreSession(score);
