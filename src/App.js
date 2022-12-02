@@ -38,11 +38,10 @@ export default class App {
       resetGame: () => this.#resetGame(),
     });
     this.container.appendChild(pageContainer);
-    this.modal = new Modal({ container: this.container });
+    this.modal = new Modal({ container: this.container, restartGame: () => this.#restartGame() });
   }
 
   #setScoreInScoreBoard(realTimeScore) {
-    console.log(realTimeScore);
     return this.scoreBoard.setScore(realTimeScore);
   }
 
@@ -62,9 +61,5 @@ export default class App {
 
   #showModal() {
     this.modal.showModal();
-  }
-
-  #closeModal() {
-    this.modal.closeModal();
   }
 }

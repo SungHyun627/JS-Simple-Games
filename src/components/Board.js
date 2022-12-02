@@ -210,7 +210,7 @@ export default class Board {
     }
 
     if (this.isSnakeGetApple(this.state.snakeQueue[0].x, this.state.snakeQueue[0].y)) {
-      console.log('Get Apple');
+      // console.log('Get Apple');
       const curQueue = this.state.snakeQueue.slice();
       curQueue.push(this.state.removedSnakeCell);
       this.setState({
