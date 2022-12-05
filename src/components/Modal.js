@@ -17,6 +17,13 @@ export default class Modal {
     window.addEventListener('keyup', this.closeModalWithEscapeKey.bind(this));
     const modalConatiner = document.createElement('div');
     modalConatiner.classList.add('modal__container-hidden');
+
+    const modalBackground = document.createElement('div');
+    modalBackground.classList.add('modal__background');
+
+    const modalWrapper = document.createElement('div');
+    modalWrapper.classList.add('modal__wrapper');
+
     const modalCloseButton = document.createElement('img');
     modalCloseButton.classList.add('modal__close__icon');
     modalCloseButton.setAttribute('src', 'src/assets/close-icon.svg');
@@ -81,11 +88,14 @@ export default class Modal {
     modalControlButtons.appendChild(modalRestartButton);
     modalControlButtons.appendChild(modalStopPlayingButton);
 
-    modalConatiner.appendChild(modalCloseButton);
-    modalConatiner.appendChild(modalSnakeIcon);
-    modalConatiner.appendChild(modalGameOverText);
-    modalConatiner.appendChild(modalScoreResult);
-    modalConatiner.appendChild(modalControlButtons);
+    modalWrapper.appendChild(modalCloseButton);
+    modalWrapper.appendChild(modalSnakeIcon);
+    modalWrapper.appendChild(modalGameOverText);
+    modalWrapper.appendChild(modalScoreResult);
+    modalWrapper.appendChild(modalControlButtons);
+
+    modalConatiner.appendChild(modalBackground);
+    modalConatiner.appendChild(modalWrapper);
 
     this.container.appendChild(modalConatiner);
   }
