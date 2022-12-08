@@ -1,22 +1,12 @@
+import { $gameTitleTemplate } from '../utils/templates.js';
+
 export default class GameTitle {
-  constructor(container) {
-    this.container = container;
-    this.render(container);
+  constructor({ $target }) {
+    this.target = $target;
+    this.init();
   }
 
-  render(container) {
-    const titleContainer = document.createElement('div');
-    titleContainer.classList.add('title__container');
-
-    const snakeIcon = document.createElement('img');
-    snakeIcon.classList.add('snake__icon');
-    snakeIcon.setAttribute('src', 'src/assets/snake-icon-white.svg');
-
-    const titleText = document.createElement('div');
-    titleText.classList.add('title__text');
-    titleText.innerHTML = 'Snake Game';
-    titleContainer.appendChild(snakeIcon);
-    titleContainer.appendChild(titleText);
-    container.appendChild(titleContainer);
+  init() {
+    this.target.innerHTML = $gameTitleTemplate;
   }
 }

@@ -1,57 +1,19 @@
+import { $scoreBoardTemplate } from '../utils/templates.js';
+
 export default class ScoreBoard {
-  constructor({ container, ...props }) {
-    this.container = container;
-    this.props = props;
+  constructor({ $target }) {
     this.state = { realTimeScore: 0, bestScore: this.getBestScoreSession() };
-    this.initScoreBoard();
+    this.target = $target;
+    this.init();
   }
 
-  initScoreBoard() {
-    const scoreBoardContainer = document.createElement('div');
-    scoreBoardContainer.classList.add('scoreboard__container');
-
-    const realTimeScore = document.createElement('div');
-    realTimeScore.classList.add('realtime__score');
-
-    const realTimeScoreIcon = document.createElement('img');
-    realTimeScoreIcon.classList.add('score__icon');
-    realTimeScoreIcon.setAttribute('src', 'src/assets/apple.svg');
-
-    const realTimeScoreText = document.createElement('div');
-    realTimeScoreText.classList.add('scoreboard__score__text');
-    realTimeScoreText.innerHTML = this.state.realTimeScore;
-
-    const bestScore = document.createElement('div');
-    bestScore.classList.add('best__score');
-
-    const bestScoreIcon = document.createElement('img');
-    bestScoreIcon.classList.add('score__icon');
-    bestScoreIcon.setAttribute('src', 'src/assets/trophy.svg');
-
-    const bestScoreText = document.createElement('div');
-    bestScoreText.classList.add('scoreboard__score__text');
-    bestScoreText.innerHTML = this.state.bestScore;
-
-    realTimeScore.appendChild(realTimeScoreIcon);
-    realTimeScore.appendChild(realTimeScoreText);
-
-    bestScore.appendChild(bestScoreIcon);
-    bestScore.appendChild(bestScoreText);
-
-    scoreBoardContainer.appendChild(realTimeScore);
-    scoreBoardContainer.appendChild(bestScore);
-
-    this.container.appendChild(scoreBoardContainer);
+  init() {
+    this.target.innerHTML = $scoreBoardTemplate;
   }
 
   setState(newState) {
     this.state = { ...this.state, ...newState };
     this.render();
-  }
-
-  init() {
-    this.setState({ realTimeScore: 0, bestScore: 0 });
-    this.setBestScoreSession(0);
   }
 
   resetRealTimeScore() {
@@ -63,7 +25,6 @@ export default class ScoreBoard {
       '.realtime__score .scoreboard__score__text'
     );
     const bestScoreTextElement = document.querySelector('.best__score .scoreboard__score__text');
-    // console.log(realTimeScoreTextElement, bestScoreTextElement);
     realTimeScoreTextElement.innerHTML = this.state.realTimeScore;
     bestScoreTextElement.innerHTML = this.state.bestScore;
   }

@@ -8,7 +8,7 @@ body {
   padding: 0;
 }
 
-.page__container {
+.app__container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -133,7 +133,7 @@ body {
   transform: rotate(270deg);
 }
 
-.apple-icon {
+.apple__icon {
   width: 25px;
   height: 25px;
 }
@@ -269,6 +269,6 @@ body {
   margin-bottom: 20px;
 }
 
-.modal__stopplaying__btn {
+.modal__stop__playing__btn {
   background-color: #551515;
 }

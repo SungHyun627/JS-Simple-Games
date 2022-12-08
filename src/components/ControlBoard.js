@@ -1,27 +1,23 @@
+import { $controlBoardTemplate } from '../utils/templates.js';
+
 export default class ControlBoard {
-  constructor({ container, ...props }) {
-    this.container = container;
+  constructor({ $target, ...props }) {
+    this.target = $target;
     this.props = props;
-    this.render();
+    this.init();
   }
 
-  render() {
-    const controlBoardContainer = document.createElement('div');
-    controlBoardContainer.classList.add('control-board__container');
+  init() {
+    this.target.innerHTML = $controlBoardTemplate;
+    this.initEvent();
+  }
 
-    const restartBtn = document.createElement('button');
-    restartBtn.classList.add('restart__btn');
-    restartBtn.innerHTML = 'Restart';
-    restartBtn.addEventListener('click', () => this.props.restartGame());
-
-    const resetBtn = document.createElement('button');
-    resetBtn.classList.add('reset__btn');
-    resetBtn.innerHTML = 'Reset';
-    resetBtn.addEventListener('click', () => this.props.resetGame());
-
-    controlBoardContainer.appendChild(restartBtn);
-    controlBoardContainer.appendChild(resetBtn);
-
-    this.container.appendChild(controlBoardContainer);
+  initEvent() {
+    this.target
+      .querySelector('.restart__btn')
+      .addEventListener('click', () => this.props.restartGame());
+    this.target
+      .querySelector('.reset__btn')
+      .addEventListener('click', () => this.props.resetGame());
   }
 }

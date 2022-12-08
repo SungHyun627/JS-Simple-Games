@@ -1,11 +1,12 @@
 import { MODAL_STATE } from '../constants/constants.js';
+import { $modalTemplate } from '../utils/templates.js';
 
 export default class Modal {
-  constructor({ container, ...props }) {
-    this.container = container;
+  constructor({ $target, ...props }) {
     this.state = { modalState: MODAL_STATE.HIDDEN };
+    this.target = $target;
     this.props = props;
-    this.initModal();
+    this.init();
   }
 
   setState(newState) {
@@ -13,91 +14,22 @@ export default class Modal {
     this.render();
   }
 
-  initModal() {
+  init() {
+    this.target.innerHTML = $modalTemplate;
+    this.initEvent();
+  }
+
+  initEvent() {
     window.addEventListener('keyup', this.closeModalWithEscapeKey.bind(this));
-    const modalConatiner = document.createElement('div');
-    modalConatiner.classList.add('modal__container-hidden');
-
-    const modalBackground = document.createElement('div');
-    modalBackground.classList.add('modal__background');
-
-    const modalWrapper = document.createElement('div');
-    modalWrapper.classList.add('modal__wrapper');
-
-    const modalCloseButton = document.createElement('img');
-    modalCloseButton.classList.add('modal__close__icon');
-    modalCloseButton.setAttribute('src', 'src/assets/close-icon.svg');
-    modalCloseButton.addEventListener('click', this.closeModal.bind(this));
-
-    const modalSnakeIcon = document.createElement('img');
-    modalSnakeIcon.classList.add('modal__snake__icon');
-    modalSnakeIcon.setAttribute('src', 'src/assets/snake-icon-black.svg');
-
-    const modalGameOverText = document.createElement('div');
-    modalGameOverText.classList.add('modal__gameover__text');
-    modalGameOverText.innerHTML = 'Game Over';
-
-    const modalScoreResult = document.createElement('div');
-    modalScoreResult.classList.add('modal__score__result');
-
-    const modalRealTimeScore = document.createElement('div');
-    modalRealTimeScore.classList.add('modal__realtime__score');
-
-    const modalRealTimeScoreIcon = document.createElement('img');
-    modalRealTimeScoreIcon.classList.add('score__icon');
-    modalRealTimeScoreIcon.setAttribute('src', 'src/assets/apple.svg');
-
-    const modalRealTimeScoreText = document.createElement('div');
-    modalRealTimeScoreText.classList.add('modal__realtime__score__text');
-
-    modalRealTimeScoreText.innerHTML = 0;
-
-    modalRealTimeScore.appendChild(modalRealTimeScoreIcon);
-    modalRealTimeScore.appendChild(modalRealTimeScoreText);
-
-    const modalBestScore = document.createElement('div');
-    modalBestScore.classList.add('modal__best__score');
-
-    const modalBestScoreIcon = document.createElement('img');
-    modalBestScoreIcon.classList.add('score__icon');
-    modalBestScoreIcon.setAttribute('src', 'src/assets/trophy.svg');
-
-    const modalBestScoreText = document.createElement('div');
-    modalBestScoreText.classList.add('modal__best__score__text');
-    modalBestScoreText.innerHTML = 0;
-
-    modalBestScore.appendChild(modalBestScoreIcon);
-    modalBestScore.appendChild(modalBestScoreText);
-
-    modalScoreResult.appendChild(modalRealTimeScore);
-    modalScoreResult.appendChild(modalBestScore);
-
-    const modalControlButtons = document.createElement('div');
-    modalControlButtons.classList.add('modal__control__btns');
-
-    const modalRestartButton = document.createElement('button');
-    modalRestartButton.classList.add('modal__restart__btn');
-    modalRestartButton.innerHTML = 'Restart Game';
-    modalRestartButton.addEventListener('click', this.closeModalForRestartGame.bind(this));
-
-    const modalStopPlayingButton = document.createElement('button');
-    modalStopPlayingButton.classList.add('modal__stopplaying__btn');
-    modalStopPlayingButton.innerHTML = 'Stop Playing';
-    modalStopPlayingButton.addEventListener('click', this.closeModal.bind(this));
-
-    modalControlButtons.appendChild(modalRestartButton);
-    modalControlButtons.appendChild(modalStopPlayingButton);
-
-    modalWrapper.appendChild(modalCloseButton);
-    modalWrapper.appendChild(modalSnakeIcon);
-    modalWrapper.appendChild(modalGameOverText);
-    modalWrapper.appendChild(modalScoreResult);
-    modalWrapper.appendChild(modalControlButtons);
-
-    modalConatiner.appendChild(modalBackground);
-    modalConatiner.appendChild(modalWrapper);
-
-    this.container.appendChild(modalConatiner);
+    this.target
+      .querySelector('.modal__close__icon')
+      .addEventListener('click', this.closeModal.bind(this));
+    this.target
+      .querySelector('.modal__restart__btn')
+      .addEventListener('click', this.closeModalForRestartGame.bind(this));
+    this.target
+      .querySelector('.modal__stop__playing__btn')
+      .addEventListener('click', this.closeModal.bind(this));
   }
 
   render() {
