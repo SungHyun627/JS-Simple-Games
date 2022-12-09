@@ -13,34 +13,40 @@ export default class App {
 
   init() {
     const $appContainer = $createElement({ elementType: 'div', className: 'app__container' });
-    const $gameTitle = $createElement({ elementType: 'div', className: 'title__container' });
-    const $scoreBoard = $createElement({ elementType: 'div', className: 'scoreboard__container' });
-    const $board = $createElement({ elementType: 'div', className: 'board__container' });
-    const $controlBoard = $createElement({
+    const $gameTitleContainer = $createElement({
+      elementType: 'div',
+      className: 'title__container',
+    });
+    const $scoreBoardContainer = $createElement({
+      elementType: 'div',
+      className: 'scoreboard__container',
+    });
+    const $boardContainer = $createElement({ elementType: 'div', className: 'board__container' });
+    const $controlBoardContainer = $createElement({
       elementType: 'div',
       className: 'control-board__container',
     });
     const $modal = $createElement({ elementType: 'div', className: 'modal__container-hidden' });
 
-    new GameTitle({ $target: $gameTitle });
-    new ScoreBoard({ $target: $scoreBoard });
+    new GameTitle({ $target: $gameTitleContainer });
+    new ScoreBoard({ $target: $scoreBoardContainer });
     new Board({
-      $target: $board,
+      $target: $boardContainer,
       showModal: () => this.#showModal(),
       setScoreInScoreBoard: (realTimeScore) => this.#setScoreInScoreBoard(realTimeScore),
       setScoreInModal: (realTimeScore) => this.#setScoreInModal(realTimeScore),
     });
     new ControlBoard({
-      $target: $controlBoard,
+      $target: $controlBoardContainer,
       restartGame: () => this.#restartGame(),
       resetGame: () => this.#resetGame(),
     });
     new Modal({ $target: $modal, restartGame: () => this.#restartGame() });
 
-    $appContainer.appendChild($gameTitle);
-    $appContainer.appendChild($scoreBoard);
-    $appContainer.appendChild($board);
-    $appContainer.appendChild($controlBoard);
+    $appContainer.appendChild($gameTitleContainer);
+    $appContainer.appendChild($scoreBoardContainer);
+    $appContainer.appendChild($boardContainer);
+    $appContainer.appendChild($controlBoardContainer);
 
     $appContainer.appendChild($modal);
 

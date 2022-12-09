@@ -40,5 +40,3 @@ export const $controlBoardTemplate = `
   <button class="restart__btn">Restart</button>
   <button class="reset__btn">Reset</button>
 `;
-
-// export const $boardTemplate =

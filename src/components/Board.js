@@ -6,12 +6,14 @@ import {
   INITIAL_SNAKE_LENGTH,
 } from '../constants/constants.js';
 import {
-  directionKeys,
   directions,
   isSameDirection,
   isReverseDirection,
-  addPos,
+  isDirectionKeycode,
+  directionArr,
+  getDirectionName,
 } from '../utils/controlSnake.js';
+
 import { $createAppleIconElement, $createCellElement } from '../utils/createElements.js';
 import { createApplePos, comparePos } from '../utils/createApplePos.js';
 import { Scheduler } from '../utils/scheduler.js';
@@ -21,7 +23,16 @@ import {
   $addSnakeClass,
   $addSnakeHeadClass,
   $addAppleClass,
-} from '../utils/mainpulateClassName.js';
+} from '../utils/mainpulateClass.js';
+
+import {
+  addSnakeCell,
+  addSnakeHeadCell,
+  removeSnakeHeadCell,
+  removeSnakeCell,
+} from '../utils/render.js';
+
+import { getCellDomElement } from '../utils/domSelector.js';
 
 const inititalState = {
   snakeQueue: [
@@ -30,8 +41,8 @@ const inititalState = {
     { x: 9, y: 4 },
   ],
   direction: 0,
-  removedAppleCell: null,
-  removedSnakeCell: null,
+  removedApplePos: null,
+  removedSnakePos: null,
   eventType: null,
   gameState: GAME_STATE.BEFORE_START,
 };
@@ -47,9 +58,12 @@ export default class Board {
     this.init();
   }
 
-  setState(newState) {
+  setState(newState, eventType) {
     this.state = { ...this.state, ...newState };
-    this.render();
+    console.log(this.state);
+    if (eventType === EVENT_TYPES.MOVE_FORWARD) {
+      this.moveForWard();
+    }
   }
 
   init() {
@@ -83,12 +97,12 @@ export default class Board {
     });
 
     this.state.snakeQueue.forEach((snakePos, snakeIdx) => {
-      const snakeCell = this.getCellDomElement(this.target, snakePos);
+      const snakeCell = getCellDomElement(this.target, snakePos);
       $addSnakeClass(snakeCell);
       if (this.isSnakeHead(snakeIdx)) $addSnakeHeadClass(snakeCell, 'Right');
     });
 
-    const appleCell = this.getCellDomElement(this.target, this.state.applePos);
+    const appleCell = getCellDomElement(this.target, this.state.applePos);
     const appeIcon = $createAppleIconElement();
     appleCell.appendChild(appeIcon);
     $addAppleClass(appleCell);
@@ -106,43 +120,55 @@ export default class Board {
     return snakeIdx === 0;
   }
 
+  isBeforeGameStart() {
+    return this.state.gameState === GAME_STATE.BEFORE_START;
+  }
+
+  isPlayingGame() {
+    return this.state.gameState === GAME_STATE.PLAYING;
+  }
+
   changeDirection(e) {
     if (
-      this.state.gameState === GAME_STATE.BEFORE_START &&
-      directionKeys.includes(e.key) &&
+      this.isBeforeGameStart() &&
+      isDirectionKeycode(e.key) &&
       !isReverseDirection(e.key, this.state.direction)
     ) {
       this.play();
-      this.setState({
-        gameState: GAME_STATE.PLAYING,
-        direction: directions[e.key.replace('Arrow', '')],
-        eventType: EVENT_TYPES.CHANGE_DIRECTION,
-      });
+      this.setState(
+        {
+          gameState: GAME_STATE.PLAYING,
+          direction: directions[e.key.replace('Arrow', '')],
+          eventType: EVENT_TYPES.CHANGE_DIRECTION,
+        },
+        false
+      );
     }
 
     if (
-      this.state.gameState === GAME_STATE.PLAYING &&
-      directionKeys.includes(e.key) &&
+      this.isPlayingGame() &&
+      isDirectionKeycode(e.key) &&
       !isSameDirection(e.key, this.state.direction) &&
       !isReverseDirection(e.key, this.state.direction)
     ) {
-      this.setState({
-        direction: directions[e.key.replace('Arrow', '')],
-        eventType: EVENT_TYPES.CHANGE_DIRECTION,
-      });
+      this.setState(
+        {
+          direction: directions[e.key.replace('Arrow', '')],
+          eventType: EVENT_TYPES.CHANGE_DIRECTION,
+        },
+        false
+      );
     }
   }
 
-  getAddedSnakeCell() {
-    const curHeadPos = this.state.snakeQueue[0];
+  getNextSnakeHeadPos() {
+    const { x: headPosX, y: headPosY } = this.state.snakeQueue[0];
+    const nextHeadPosX = headPosX + directionArr[this.state.direction][0];
+    const nextHeadPosY = headPosY + directionArr[this.state.direction][1];
     return {
-      x: curHeadPos.x + addPos[this.state.direction][0],
-      y: curHeadPos.y + addPos[this.state.direction][1],
+      nextHeadPosX,
+      nextHeadPosY,
     };
-  }
-
-  getCellDomElement(target, cell) {
-    return target.querySelector(`[data-row="${cell.x}"][data-col="${cell.y}"]`);
   }
 
   play() {
@@ -161,91 +187,77 @@ export default class Board {
   }
 
   isGameOver() {
-    return this.state.gameState === GAME_STATE.gameOver;
+    return this.state.gameState === GAME_STATE.GAME_OVER;
   }
 
   moveSnake() {
-    const { x: headCellPosX, y: headCellPosY } = this.state.snakeQueue[0];
-
-    if (
-      this.isOutOfRange(
-        headCellPosX + addPos[this.state.direction][0],
-        headCellPosY + addPos[this.state.direction][1]
-      )
-    ) {
+    const { nextHeadPosX, nextHeadPosY } = this.getNextSnakeHeadPos();
+    if (this.isOutOfRange(nextHeadPosX, nextHeadPosY)) {
       // console.log('Hit wall');
-      this.setState({ gameState: GAME_STATE.GAME_OVER, eventType: EVENT_TYPES.HIT_WALL });
+      this.setState({ gameState: GAME_STATE.GAME_OVER }, true);
+      const headCell = { ...this.state.snakeQueue[0] };
+      const headCellElement = getCellDomElement(document, headCell);
+      headCellElement.classList.remove(`snake__head-${getDirectionName(this.state.direction)}`);
+      headCellElement.classList.add(
+        `snake__head__collision-${getDirectionName(this.state.direction)}`
+      );
+
       this.gameOver();
     }
 
-    if (
-      this.isHitWithSnakeBody(
-        headCellPosX + addPos[this.state.direction][0],
-        headCellPosY + addPos[this.state.direction][1],
-        this.state.snakeQueue.slice(0, -1)
-      )
-    ) {
+    if (this.isHitWithSnakeBody(nextHeadPosX, nextHeadPosY, this.state.snakeQueue.slice(0, -1))) {
       // console.log('Hit Snake Body');
-      this.setState({ gameState: GAME_STATE.GAME_OVER, eventType: EVENT_TYPES.HIT_SNAKE_BODY });
+      this.setState(
+        { gameState: GAME_STATE.GAME_OVER, eventType: EVENT_TYPES.HIT_SNAKE_BODY },
+        true
+      );
       this.gameOver();
     }
 
-    if (
-      this.state.gameState === GAME_STATE.PLAYING &&
-      !this.isOutOfRange(
-        headCellPosX + addPos[this.state.direction][0],
-        headCellPosY + addPos[this.state.direction][1]
-      )
-    ) {
-      // console.log('Move ForWard');
-      const curQueue = this.state.snakeQueue.slice();
-      curQueue.unshift(this.getAddedSnakeCell());
-      const removedCell = curQueue.pop();
-      this.setState({
-        snakeQueue: curQueue.slice(),
-        removedSnakeCell: removedCell,
-        eventType: EVENT_TYPES.MOVE_FORWARD,
-      });
+    if (this.isPlayingGame() && !this.isOutOfRange(nextHeadPosX, nextHeadPosY)) {
+      console.log('Move ForWard');
+      const curSnakeQueue = this.state.snakeQueue.slice();
+      curSnakeQueue.unshift({ x: nextHeadPosX, y: nextHeadPosY });
+      const nextRemovedSnakePos = curSnakeQueue.pop();
+      this.setState(
+        {
+          snakeQueue: curSnakeQueue.slice(),
+          removedSnakePos: nextRemovedSnakePos,
+        },
+        EVENT_TYPES.MOVE_FORWARD
+      );
     }
 
-    if (this.isSnakeGetApple(this.state.snakeQueue[0].x, this.state.snakeQueue[0].y)) {
+    if (this.isSnakeGetApple(nextHeadPosX, nextHeadPosY)) {
       // console.log('Get Apple');
       const curQueue = this.state.snakeQueue.slice();
-      curQueue.push(this.state.removedSnakeCell);
-      this.setState({
-        snakeQueue: curQueue.slice(),
-        appleCell: {
-          ...createApplePos(this.state.snakeQueue),
+      curQueue.push(this.state.removedSnakePos);
+      this.setState(
+        {
+          snakeQueue: curQueue.slice(),
+          appleCell: {
+            ...createApplePos(this.state.snakeQueue),
+          },
+          removedAppleCell: { ...this.state.appleCell },
+          eventType: EVENT_TYPES.GET_APPLE,
         },
-        removedAppleCell: { ...this.state.appleCell },
-        eventType: EVENT_TYPES.GET_APPLE,
-      });
+        true
+      );
       const realTimeScore = this.getScore();
       this.props.setScoreInScoreBoard(realTimeScore);
     }
   }
 
-  removeHeadClassName(cell) {
-    Object.keys(directions).forEach((key) => cell.classList.remove(`snake__head-${key}`));
-    Object.keys(directions).forEach((key) =>
-      cell.classList.remove(`snake__head__collision-${key}`)
-    );
-  }
-
   removeAllSnakeCellClassName() {
     this.state.snakeQueue.forEach((snakePos, idx) => {
-      const snakeCellDomElement = this.getCellDomElement(document, snakePos);
+      const snakeCellDomElement = getCellDomElement(this.target, snakePos);
       snakeCellDomElement.classList.remove('snake__cell');
       if (idx === 0) this.removeHeadClassName(snakeCellDomElement);
     });
   }
 
-  getDirectionName(direction) {
-    return Object.keys(directions).find((key) => directions[key] === direction);
-  }
-
   isSnakeGetApple(posX, posY) {
-    return posX === this.state.appleCell.x && posY === this.state.appleCell.y;
+    return posX === this.state.applePos.x && posY === this.state.applePos.y;
   }
 
   isOutOfRange(posX, posY) {
@@ -260,58 +272,48 @@ export default class Board {
     return this.state.snakeQueue.length - INITIAL_SNAKE_LENGTH;
   }
 
+  moveForWard() {
+    addSnakeCell(this.target, this.state);
+    addSnakeHeadCell(this.target, this.state);
+    removeSnakeHeadCell(this.target, this.state);
+    removeSnakeCell(this.target, this.state);
+  }
+
   render() {
-    if (this.state.eventType === EVENT_TYPES.CHANGE_DIRECTION) return;
     if (this.state.eventType === EVENT_TYPES.RESTART_GAME) {
       this.state.snakeQueue.forEach((snakePos, idx) => {
-        const snakePosDomElement = this.getCellDomElement(document, snakePos);
+        const snakePosDomElement = getCellDomElement(document, snakePos);
         if (idx === 0)
-          snakePosDomElement.classList.add(
-            `snake__head-${this.getDirectionName(this.state.direction)}`
-          );
+          snakePosDomElement.classList.add(`snake__head-${getDirectionName(this.state.direction)}`);
         snakePosDomElement.classList.add('snake__cell');
       });
 
       const removedAppleCell = { ...this.state.removedAppleCell };
-      const removedAppleCellElement = this.getCellDomElement(document, removedAppleCell);
+      const removedAppleCellElement = getCellDomElement(document, removedAppleCell);
       removedAppleCellElement.classList.remove('apple__cell');
       removedAppleCellElement.removeChild(removedAppleCellElement.firstChild);
 
       const appleCell = { ...this.state.appleCell };
-      const appleCellElement = this.getCellDomElement(document, appleCell);
+      const appleCellElement = getCellDomElement(document, appleCell);
       appleCellElement.classList.add('apple__cell');
       const apple = document.createElement('img');
       apple.setAttribute('src', './src/assets/apple.svg');
       apple.classList.add('apple__icon');
       appleCellElement.appendChild(apple);
     }
-    if (this.state.eventType === EVENT_TYPES.MOVE_FORWARD) {
-      const headCell = { ...this.state.snakeQueue[0] };
-      const preHeadCell = { ...this.state.snakeQueue[1] };
-      const removedCell = { ...this.state.removedSnakeCell };
-
-      const headCellElement = this.getCellDomElement(document, headCell);
-      const preHeadCellElement = this.getCellDomElement(document, preHeadCell);
-      const removedCellElement = this.getCellDomElement(document, removedCell);
-      this.removeHeadClassName(preHeadCellElement);
-      headCellElement.classList.add('snake__cell');
-      headCellElement.classList.add(`snake__head-${this.getDirectionName(this.state.direction)}`);
-
-      removedCellElement.classList.remove('snake__cell');
-    }
 
     if (this.state.eventType === EVENT_TYPES.GET_APPLE) {
       const removedAppleCell = { ...this.state.removedAppleCell };
-      const removedAppleCellElement = this.getCellDomElement(document, removedAppleCell);
+      const removedAppleCellElement = getCellDomElement(document, removedAppleCell);
       removedAppleCellElement.classList.remove('apple__cell');
       removedAppleCellElement.removeChild(removedAppleCellElement.firstChild);
 
       const addedToTailCell = this.state.snakeQueue[this.state.snakeQueue.length - 1];
-      const addedToTailCellElement = this.getCellDomElement(document, addedToTailCell);
+      const addedToTailCellElement = getCellDomElement(document, addedToTailCell);
       addedToTailCellElement.classList.add('snake__cell');
 
       const appleCell = { ...this.state.appleCell };
-      const appleCellElement = this.getCellDomElement(document, appleCell);
+      const appleCellElement = getCellDomElement(document, appleCell);
       appleCellElement.classList.add('apple__cell');
       const apple = document.createElement('img');
       apple.setAttribute('src', './src/assets/apple.svg');
@@ -321,25 +323,12 @@ export default class Board {
       removedAppleCellElement.classList.add('snake__cell');
     }
 
-    if (this.state.eventType === EVENT_TYPES.HIT_WALL) {
-      const headCell = { ...this.state.snakeQueue[0] };
-      const headCellElement = this.getCellDomElement(document, headCell);
-      headCellElement.classList.remove(
-        `snake__head-${this.getDirectionName(this.state.direction)}`
-      );
-      headCellElement.classList.add(
-        `snake__head__collision-${this.getDirectionName(this.state.direction)}`
-      );
-    }
-
     if (this.state.eventType === EVENT_TYPES.HIT_SNAKE_BODY) {
       const headCell = { ...this.state.snakeQueue[0] };
-      const headCellElement = this.getCellDomElement(document, headCell);
-      headCellElement.classList.remove(
-        `snake__head-${this.getDirectionName(this.state.direction)}`
-      );
+      const headCellElement = getCellDomElement(document, headCell);
+      headCellElement.classList.remove(`snake__head-${getDirectionName(this.state.direction)}`);
       headCellElement.classList.add(
-        `snake__head__collision-${this.getDirectionName(this.state.direction)}`
+        `snake__head__collision-${getDirectionName(this.state.direction)}`
       );
     }
   }
