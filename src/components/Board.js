@@ -30,6 +30,7 @@ import {
   addSnakeHeadCell,
   removeSnakeHeadCell,
   removeSnakeCell,
+  addSnakeCollisionHeadCell,
 } from '../utils/render.js';
 
 import { getCellDomElement } from '../utils/domSelector.js';
@@ -63,6 +64,9 @@ export default class Board {
     console.log(this.state);
     if (eventType === EVENT_TYPES.MOVE_FORWARD) {
       this.moveForWard();
+    }
+    if (eventType === EVENT_TYPES.COLLIDE_WITH_WALL) {
+      this.collisionWithWall();
     }
   }
 
@@ -193,29 +197,23 @@ export default class Board {
   moveSnake() {
     const { nextHeadPosX, nextHeadPosY } = this.getNextSnakeHeadPos();
     if (this.isOutOfRange(nextHeadPosX, nextHeadPosY)) {
-      // console.log('Hit wall');
-      this.setState({ gameState: GAME_STATE.GAME_OVER }, true);
-      const headCell = { ...this.state.snakeQueue[0] };
-      const headCellElement = getCellDomElement(document, headCell);
-      headCellElement.classList.remove(`snake__head-${getDirectionName(this.state.direction)}`);
-      headCellElement.classList.add(
-        `snake__head__collision-${getDirectionName(this.state.direction)}`
-      );
-
+      // console.log('Collide with wall');
+      this.setState({ gameState: GAME_STATE.GAME_OVER }, EVENT_TYPES.COLLIDE_WITH_WALL);
       this.gameOver();
     }
 
-    if (this.isHitWithSnakeBody(nextHeadPosX, nextHeadPosY, this.state.snakeQueue.slice(0, -1))) {
-      // console.log('Hit Snake Body');
+    if (
+      this.isCollideWithSnakeBody(nextHeadPosX, nextHeadPosY, this.state.snakeQueue.slice(0, -1))
+    ) {
+      // console.log('Collide with Snake Body');
       this.setState(
-        { gameState: GAME_STATE.GAME_OVER, eventType: EVENT_TYPES.HIT_SNAKE_BODY },
+        { gameState: GAME_STATE.GAME_OVER, eventType: EVENT_TYPES.COLLIDE_WITH_SNAKE_BODY },
         true
       );
       this.gameOver();
     }
 
     if (this.isPlayingGame() && !this.isOutOfRange(nextHeadPosX, nextHeadPosY)) {
-      console.log('Move ForWard');
       const curSnakeQueue = this.state.snakeQueue.slice();
       curSnakeQueue.unshift({ x: nextHeadPosX, y: nextHeadPosY });
       const nextRemovedSnakePos = curSnakeQueue.pop();
@@ -248,14 +246,6 @@ export default class Board {
     }
   }
 
-  removeAllSnakeCellClassName() {
-    this.state.snakeQueue.forEach((snakePos, idx) => {
-      const snakeCellDomElement = getCellDomElement(this.target, snakePos);
-      snakeCellDomElement.classList.remove('snake__cell');
-      if (idx === 0) this.removeHeadClassName(snakeCellDomElement);
-    });
-  }
-
   isSnakeGetApple(posX, posY) {
     return posX === this.state.applePos.x && posY === this.state.applePos.y;
   }
@@ -264,7 +254,7 @@ export default class Board {
     return posX < 0 || posX >= BOARD_ROW_LENGTH || posY < 0 || posY >= BOARD_ROW_LENGTH;
   }
 
-  isHitWithSnakeBody(posX, posY, queue) {
+  isCollideWithSnakeBody(posX, posY, queue) {
     return queue.some((pos) => comparePos(pos, { x: posX, y: posY }));
   }
 
@@ -277,6 +267,11 @@ export default class Board {
     addSnakeHeadCell(this.target, this.state);
     removeSnakeHeadCell(this.target, this.state);
     removeSnakeCell(this.target, this.state);
+  }
+
+  collisionWithWall() {
+    removeSnakeHeadCell(this.target, this.state);
+    addSnakeCollisionHeadCell(this.target, this.state);
   }
 
   render() {
@@ -323,7 +318,7 @@ export default class Board {
       removedAppleCellElement.classList.add('snake__cell');
     }
 
-    if (this.state.eventType === EVENT_TYPES.HIT_SNAKE_BODY) {
+    if (this.state.eventType === EVENT_TYPES.COLLIDE_WITH_SNAKE_BODY) {
       const headCell = { ...this.state.snakeQueue[0] };
       const headCellElement = getCellDomElement(document, headCell);
       headCellElement.classList.remove(`snake__head-${getDirectionName(this.state.direction)}`);

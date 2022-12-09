@@ -21,6 +21,10 @@ export const $addSnakeHeadClass = (cell, direction) => {
   cell.classList.add(`snake__head-${direction}`);
 };
 
+export const $addSnakeHeadCollisionClass = (cell, direction) => {
+  cell.classList.add(`snake__head__collision-${direction}`);
+};
+
 export const $addAppleClass = (cell) => {
   cell.classList.add('apple__cell');
 };

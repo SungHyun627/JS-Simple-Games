@@ -16,7 +16,7 @@ export const EVENT_TYPES = {
   CHANGE_DIRECTION: 'Change Direction',
   MOVE_FORWARD: 'Move Forward',
   GET_APPLE: 'Get Apple',
-  HIT_WALL: 'Hit Wall',
-  HIT_SNAKE_BODY: 'Hit Snake Body',
+  COLLIDE_WITH_WALL: 'Collide With Wall',
+  COLLIDE_WITH_SNAKE_BODY: 'Collide With Snake Body',
   RESTART_GAME: 'Restart Game',
 };
