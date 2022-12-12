@@ -1,4 +1,4 @@
-import { directions } from './controlSnake.js';
+import { directions } from './snakeDirection.js';
 import { getCellDomElement } from './domSelector.js';
 
 export const $addBoardClass = (cell) => {
@@ -29,13 +29,16 @@ export const $addAppleClass = (cell) => {
   cell.classList.add('apple__cell');
 };
 
-export const $removeHeadClass = (cell) => {
+export const $removeSnakeClass = (cell) => {
+  cell.classList.remove('snake__cell');
+};
+export const $removeSnakeHeadClass = (cell) => {
   Object.keys(directions).forEach((key) => cell.classList.remove(`snake__head-${key}`));
   Object.keys(directions).forEach((key) => cell.classList.remove(`snake__head__collision-${key}`));
 };
 
-export const $removeSnakeClass = (cell) => {
-  cell.classList.remove('snake__cell');
+export const $removeAppleClass = (cell) => {
+  cell.classList.remove('apple__cell');
 };
 
 export const $removeAllSnakeClass = (state) => {

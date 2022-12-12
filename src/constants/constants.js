@@ -12,7 +12,7 @@ export const MODAL_STATE = {
   SHOW: 'Show',
 };
 
-export const EVENT_TYPES = {
+export const EVENT_TYPE = {
   CHANGE_DIRECTION: 'Change Direction',
   MOVE_FORWARD: 'Move Forward',
   GET_APPLE: 'Get Apple',

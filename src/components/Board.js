@@ -2,18 +2,15 @@ import {
   BOARD_ROW_LENGTH,
   GAME_STATE,
   INTERVAL_TIME,
-  EVENT_TYPES,
+  EVENT_TYPE,
   INITIAL_SNAKE_LENGTH,
 } from '../constants/constants.js';
 import {
   directions,
   isSameDirection,
   isReverseDirection,
-  isDirectionKeycode,
   directionArr,
-  getDirectionName,
-} from '../utils/controlSnake.js';
-
+} from '../utils/snakeDirection.js';
 import { $createAppleIconElement, $createCellElement } from '../utils/createElements.js';
 import { createApplePos, comparePos } from '../utils/createApplePos.js';
 import { Scheduler } from '../utils/scheduler.js';
@@ -24,16 +21,17 @@ import {
   $addSnakeHeadClass,
   $addAppleClass,
 } from '../utils/mainpulateClass.js';
-
 import {
   addSnakeCell,
   addSnakeHeadCell,
   removeSnakeHeadCell,
   removeSnakeCell,
   addSnakeCollisionHeadCell,
+  addAppleCell,
+  removeAppleCell,
 } from '../utils/render.js';
-
 import { getCellDomElement } from '../utils/domSelector.js';
+import { debounce } from '../utils/debounce.js';
 
 const inititalState = {
   snakeQueue: [
@@ -44,7 +42,6 @@ const inititalState = {
   direction: 0,
   removedApplePos: null,
   removedSnakePos: null,
-  eventType: null,
   gameState: GAME_STATE.BEFORE_START,
 };
 
@@ -61,13 +58,21 @@ export default class Board {
 
   setState(newState, eventType) {
     this.state = { ...this.state, ...newState };
-    console.log(this.state);
-    if (eventType === EVENT_TYPES.MOVE_FORWARD) {
+    if (
+      JSON.stringify(this.state.snakeQueue[0]) ===
+      JSON.stringify(this.state.snakeQueue[this.state.snakeQueue.length - 1])
+    )
+      console.log('Fire');
+    if (eventType === EVENT_TYPE.MOVE_FORWARD)
+      // console.log(this.state);
       this.moveForWard();
-    }
-    if (eventType === EVENT_TYPES.COLLIDE_WITH_WALL) {
-      this.collisionWithWall();
-    }
+    if (
+      eventType === EVENT_TYPE.COLLIDE_WITH_WALL ||
+      eventType === EVENT_TYPE.COLLIDE_WITH_SNAKE_BODY
+    )
+      this.collision();
+
+    if (eventType === EVENT_TYPE.GET_APPLE) this.getApple();
   }
 
   init() {
@@ -81,7 +86,7 @@ export default class Board {
   //   this.setState({
   //     ...inititalState,
   //     appleCell: { ...createApplePos(inititalState.snakeQueue) },
-  //     eventType: EVENT_TYPES.RESTART_GAME,
+  //     eventType: EVENT_TYPE.RESTART_GAME,
   //     removedAppleCell: { ...this.state.appleCell },
   //     gameState: GAME_STATE.BEFORE_START,
   //   });
@@ -113,7 +118,10 @@ export default class Board {
   }
 
   initEvent() {
-    window.addEventListener('keyup', this.changeDirection.bind(this));
+    window.addEventListener(
+      'keyup',
+      debounce((e) => this.getDirection(e), INTERVAL_TIME)
+    );
   }
 
   calculateCellIndex(idx) {
@@ -132,37 +140,39 @@ export default class Board {
     return this.state.gameState === GAME_STATE.PLAYING;
   }
 
+  startGame(e) {
+    this.setState(
+      {
+        gameState: GAME_STATE.PLAYING,
+        direction: directions[e.key.replace('Arrow', '')],
+      },
+      EVENT_TYPE.CHANGE_DIRECTION
+    );
+    this.play();
+  }
+
   changeDirection(e) {
-    if (
-      this.isBeforeGameStart() &&
-      isDirectionKeycode(e.key) &&
-      !isReverseDirection(e.key, this.state.direction)
-    ) {
-      this.play();
-      this.setState(
-        {
-          gameState: GAME_STATE.PLAYING,
-          direction: directions[e.key.replace('Arrow', '')],
-          eventType: EVENT_TYPES.CHANGE_DIRECTION,
-        },
-        false
-      );
+    this.setState(
+      {
+        direction: directions[e.key.replace('Arrow', '')],
+      },
+      EVENT_TYPE.CHANGE_DIRECTION
+    );
+  }
+
+  getDirection(e) {
+    console.log(e.key);
+    if (this.isBeforeGameStart() && !isReverseDirection(e.key, this.state.direction)) {
+      this.startGame(e);
+      return;
     }
 
     if (
       this.isPlayingGame() &&
-      isDirectionKeycode(e.key) &&
       !isSameDirection(e.key, this.state.direction) &&
       !isReverseDirection(e.key, this.state.direction)
-    ) {
-      this.setState(
-        {
-          direction: directions[e.key.replace('Arrow', '')],
-          eventType: EVENT_TYPES.CHANGE_DIRECTION,
-        },
-        false
-      );
-    }
+    )
+      this.changeDirection(e);
   }
 
   getNextSnakeHeadPos() {
@@ -197,53 +207,54 @@ export default class Board {
   moveSnake() {
     const { nextHeadPosX, nextHeadPosY } = this.getNextSnakeHeadPos();
     if (this.isOutOfRange(nextHeadPosX, nextHeadPosY)) {
-      // console.log('Collide with wall');
-      this.setState({ gameState: GAME_STATE.GAME_OVER }, EVENT_TYPES.COLLIDE_WITH_WALL);
+      this.setState({ gameState: GAME_STATE.GAME_OVER }, EVENT_TYPE.COLLIDE_WITH_WALL);
       this.gameOver();
+      return;
     }
 
     if (
       this.isCollideWithSnakeBody(nextHeadPosX, nextHeadPosY, this.state.snakeQueue.slice(0, -1))
     ) {
-      // console.log('Collide with Snake Body');
-      this.setState(
-        { gameState: GAME_STATE.GAME_OVER, eventType: EVENT_TYPES.COLLIDE_WITH_SNAKE_BODY },
-        true
-      );
-      this.gameOver();
-    }
-
-    if (this.isPlayingGame() && !this.isOutOfRange(nextHeadPosX, nextHeadPosY)) {
-      const curSnakeQueue = this.state.snakeQueue.slice();
-      curSnakeQueue.unshift({ x: nextHeadPosX, y: nextHeadPosY });
-      const nextRemovedSnakePos = curSnakeQueue.pop();
+      console.log('Snake body');
       this.setState(
         {
-          snakeQueue: curSnakeQueue.slice(),
-          removedSnakePos: nextRemovedSnakePos,
+          gameState: GAME_STATE.GAME_OVER,
         },
-        EVENT_TYPES.MOVE_FORWARD
+        EVENT_TYPE.COLLIDE_WITH_SNAKE_BODY
       );
+      this.gameOver();
+      return;
     }
 
     if (this.isSnakeGetApple(nextHeadPosX, nextHeadPosY)) {
-      // console.log('Get Apple');
-      const curQueue = this.state.snakeQueue.slice();
-      curQueue.push(this.state.removedSnakePos);
+      console.log('Get Apple');
+      const nextSnakeQueue = this.state.snakeQueue;
+      nextSnakeQueue.unshift({ x: nextHeadPosX, y: nextHeadPosY });
       this.setState(
         {
-          snakeQueue: curQueue.slice(),
-          appleCell: {
-            ...createApplePos(this.state.snakeQueue),
+          snakeQueue: nextSnakeQueue,
+          applePos: {
+            ...createApplePos(nextSnakeQueue),
           },
-          removedAppleCell: { ...this.state.appleCell },
-          eventType: EVENT_TYPES.GET_APPLE,
+          removedApplePos: { ...this.state.applePos },
         },
-        true
+        EVENT_TYPE.GET_APPLE
       );
-      const realTimeScore = this.getScore();
-      this.props.setScoreInScoreBoard(realTimeScore);
+      return;
+      // const realTimeScore = this.getScore();
+      // this.props.setScoreInScoreBoard(realTimeScore);
     }
+
+    const nextSnakeQueue = this.state.snakeQueue;
+    nextSnakeQueue.unshift({ x: nextHeadPosX, y: nextHeadPosY });
+    const nextRemovedSnakePos = nextSnakeQueue.pop();
+    this.setState(
+      {
+        snakeQueue: nextSnakeQueue,
+        removedSnakePos: nextRemovedSnakePos,
+      },
+      EVENT_TYPE.MOVE_FORWARD
+    );
   }
 
   isSnakeGetApple(posX, posY) {
@@ -263,68 +274,44 @@ export default class Board {
   }
 
   moveForWard() {
-    addSnakeCell(this.target, this.state);
-    addSnakeHeadCell(this.target, this.state);
     removeSnakeHeadCell(this.target, this.state);
     removeSnakeCell(this.target, this.state);
+    addSnakeCell(this.target, this.state);
+    addSnakeHeadCell(this.target, this.state);
   }
 
-  collisionWithWall() {
+  collision() {
     removeSnakeHeadCell(this.target, this.state);
     addSnakeCollisionHeadCell(this.target, this.state);
   }
 
+  getApple() {
+    removeAppleCell(this.target, this.state);
+    addAppleCell(this.target, this.state);
+    addSnakeCell(this.target, this.state);
+    addSnakeHeadCell(this.target, this.state);
+    removeSnakeHeadCell(this.target, this.state);
+  }
+
   render() {
-    if (this.state.eventType === EVENT_TYPES.RESTART_GAME) {
-      this.state.snakeQueue.forEach((snakePos, idx) => {
-        const snakePosDomElement = getCellDomElement(document, snakePos);
-        if (idx === 0)
-          snakePosDomElement.classList.add(`snake__head-${getDirectionName(this.state.direction)}`);
-        snakePosDomElement.classList.add('snake__cell');
-      });
-
-      const removedAppleCell = { ...this.state.removedAppleCell };
-      const removedAppleCellElement = getCellDomElement(document, removedAppleCell);
-      removedAppleCellElement.classList.remove('apple__cell');
-      removedAppleCellElement.removeChild(removedAppleCellElement.firstChild);
-
-      const appleCell = { ...this.state.appleCell };
-      const appleCellElement = getCellDomElement(document, appleCell);
-      appleCellElement.classList.add('apple__cell');
-      const apple = document.createElement('img');
-      apple.setAttribute('src', './src/assets/apple.svg');
-      apple.classList.add('apple__icon');
-      appleCellElement.appendChild(apple);
-    }
-
-    if (this.state.eventType === EVENT_TYPES.GET_APPLE) {
-      const removedAppleCell = { ...this.state.removedAppleCell };
-      const removedAppleCellElement = getCellDomElement(document, removedAppleCell);
-      removedAppleCellElement.classList.remove('apple__cell');
-      removedAppleCellElement.removeChild(removedAppleCellElement.firstChild);
-
-      const addedToTailCell = this.state.snakeQueue[this.state.snakeQueue.length - 1];
-      const addedToTailCellElement = getCellDomElement(document, addedToTailCell);
-      addedToTailCellElement.classList.add('snake__cell');
-
-      const appleCell = { ...this.state.appleCell };
-      const appleCellElement = getCellDomElement(document, appleCell);
-      appleCellElement.classList.add('apple__cell');
-      const apple = document.createElement('img');
-      apple.setAttribute('src', './src/assets/apple.svg');
-      apple.classList.add('apple__icon');
-      appleCellElement.appendChild(apple);
-
-      removedAppleCellElement.classList.add('snake__cell');
-    }
-
-    if (this.state.eventType === EVENT_TYPES.COLLIDE_WITH_SNAKE_BODY) {
-      const headCell = { ...this.state.snakeQueue[0] };
-      const headCellElement = getCellDomElement(document, headCell);
-      headCellElement.classList.remove(`snake__head-${getDirectionName(this.state.direction)}`);
-      headCellElement.classList.add(
-        `snake__head__collision-${getDirectionName(this.state.direction)}`
-      );
-    }
+    // if (this.state.eventType === EVENT_TYPE.RESTART_GAME) {
+    //   this.state.snakeQueue.forEach((snakePos, idx) => {
+    //     const snakePosDomElement = getCellDomElement(document, snakePos);
+    //     if (idx === 0)
+    //       snakePosDomElement.classList.add(`snake__head-${getDirectionName(this.state.direction)}`);
+    //     snakePosDomElement.classList.add('snake__cell');
+    //   });
+    //   const removedAppleCell = { ...this.state.removedApplePos };
+    //   const removedAppleCellElement = getCellDomElement(document, removedAppleCell);
+    //   removedAppleCellElement.classList.remove('apple__cell');
+    //   removedAppleCellElement.removeChild(removedAppleCellElement.firstChild);
+    //   const appleCell = { ...this.state.appleCell };
+    //   const appleCellElement = getCellDomElement(document, appleCell);
+    //   appleCellElement.classList.add('apple__cell');
+    //   const apple = document.createElement('img');
+    //   apple.setAttribute('src', './src/assets/apple.svg');
+    //   apple.classList.add('apple__icon');
+    //   appleCellElement.appendChild(apple);
+    // }
   }
 }
