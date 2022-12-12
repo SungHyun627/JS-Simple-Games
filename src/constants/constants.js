@@ -18,5 +18,5 @@ export const EVENT_TYPE = {
   GET_APPLE: 'Get Apple',
   COLLIDE_WITH_WALL: 'Collide With Wall',
   COLLIDE_WITH_SNAKE_BODY: 'Collide With Snake Body',
-  RESTART_GAME: 'Restart Game',
+  INIT: 'Init Board',
 };

@@ -9,3 +9,11 @@ export const getRealtimeScoreElement = (target) => {
 export const getBestScoreElement = (target) => {
   return target.querySelector('.best__score .scoreboard__score__text');
 };
+
+export const getRestartBtnElement = (target) => {
+  return target.querySelector('.restart__btn');
+};
+
+export const getResetBtnElement = (target) => {
+  return target.querySelector('.reset__btn');
+};

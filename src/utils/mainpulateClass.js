@@ -1,5 +1,5 @@
-import { directions } from './snakeDirection.js';
 import { getCellElement } from './elementSelector.js';
+import { directions } from './snakeDirection.js';
 
 export const $addBoardClass = (cell) => {
   cell.classList.add('board__cell');
@@ -32,14 +32,6 @@ export const $addAppleClass = (cell) => {
 export const $removeSnakeClass = (cell) => {
   cell.classList.remove('snake__cell');
 };
-export const $removeSnakeHeadClass = (cell) => {
-  Object.keys(directions).forEach((key) => cell.classList.remove(`snake__head-${key}`));
-  Object.keys(directions).forEach((key) => cell.classList.remove(`snake__head__collision-${key}`));
-};
-
-export const $removeAppleClass = (cell) => {
-  cell.classList.remove('apple__cell');
-};
 
 export const $removeAllSnakeClass = (state) => {
   state.snakeQueue.forEach((snakePos, idx) => {
@@ -47,4 +39,16 @@ export const $removeAllSnakeClass = (state) => {
     $removeSnakeClass(snakeCell);
     if (idx === 0) this.removeHeadClassName(snakeCell);
   });
+};
+
+export const $removeSnakeHeadClass = (cell) => {
+  Object.keys(directions).forEach((key) => cell.classList.remove(`snake__head-${key}`));
+};
+
+export const $removeSnakeCollisionHeadClass = (cell) => {
+  Object.keys(directions).forEach((key) => cell.classList.remove(`snake__head__collision-${key}`));
+};
+
+export const $removeAppleClass = (cell) => {
+  cell.classList.remove('apple__cell');
 };

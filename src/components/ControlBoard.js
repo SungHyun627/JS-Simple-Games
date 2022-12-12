@@ -1,3 +1,4 @@
+import { getResetBtnElement, getRestartBtnElement } from '../utils/elementSelector.js';
 import { $controlBoardTemplate } from '../utils/templates.js';
 
 export default class ControlBoard {
@@ -13,11 +14,9 @@ export default class ControlBoard {
   }
 
   initEvent() {
-    this.target
-      .querySelector('.restart__btn')
-      .addEventListener('click', () => this.props.restartGame());
-    this.target
-      .querySelector('.reset__btn')
-      .addEventListener('click', () => this.props.resetGame());
+    const restartBtnElement = getRestartBtnElement(this.target);
+    const resetBtnElement = getResetBtnElement(this.target);
+    restartBtnElement.addEventListener('click', () => this.props.restartGame());
+    resetBtnElement.addEventListener('click', () => this.props.resetGame());
   }
 }
