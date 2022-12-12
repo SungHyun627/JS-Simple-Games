@@ -1,15 +1,23 @@
 export class Scheduler {
-  constructor(callback, delay) {
+  constructor(callback, interval) {
     this.callback = callback;
-    this.id = '';
-    this.delay = delay;
+    this.isEnd = false;
+    this.interval = interval;
   }
 
   start() {
-    this.id = setInterval(this.callback, this.delay);
+    this.isEnd = false;
+    this.play();
+  }
+
+  play() {
+    setTimeout(() => {
+      if (!this.$end) this.callback();
+      this.play();
+    }, this.interval);
   }
 
   end() {
-    clearInterval(this.id);
+    this.isEnd = true;
   }
 }
