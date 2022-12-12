@@ -1,5 +1,5 @@
 import { directions } from './snakeDirection.js';
-import { getCellDomElement } from './domSelector.js';
+import { getCellElement } from './elementSelector.js';
 
 export const $addBoardClass = (cell) => {
   cell.classList.add('board__cell');
@@ -43,7 +43,7 @@ export const $removeAppleClass = (cell) => {
 
 export const $removeAllSnakeClass = (state) => {
   state.snakeQueue.forEach((snakePos, idx) => {
-    const snakeCell = getCellDomElement(document, snakePos);
+    const snakeCell = getCellElement(document, snakePos);
     $removeSnakeClass(snakeCell);
     if (idx === 0) this.removeHeadClassName(snakeCell);
   });

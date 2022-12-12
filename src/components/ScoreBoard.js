@@ -1,8 +1,9 @@
+import { printBestScore, printRealTimeScore } from '../utils/render.js';
 import { $scoreBoardTemplate } from '../utils/templates.js';
 
 export default class ScoreBoard {
   constructor({ $target }) {
-    this.state = { realTimeScore: 0, bestScore: this.getBestScoreSession() };
+    this.state = { realtimeScore: 0, bestScore: this.getBestScoreSession() };
     this.target = $target;
     this.init();
   }
@@ -13,28 +14,20 @@ export default class ScoreBoard {
 
   setState(newState) {
     this.state = { ...this.state, ...newState };
-    this.render();
+    printRealTimeScore(this.target, this.state);
+    printBestScore(this.target, this.state);
   }
 
-  resetRealTimeScore() {
-    this.setState({ realTimeScore: 0 });
-  }
-
-  render() {
-    const realTimeScoreTextElement = document.querySelector(
-      '.realtime__score .scoreboard__score__text'
-    );
-    const bestScoreTextElement = document.querySelector('.best__score .scoreboard__score__text');
-    realTimeScoreTextElement.innerHTML = this.state.realTimeScore;
-    bestScoreTextElement.innerHTML = this.state.bestScore;
+  resetRealtimeScore() {
+    this.setState({ realtimeScore: 0 });
   }
 
   setScore(score) {
-    if (this.isRealTimeScoreBiggerThanBestScore(score)) {
-      this.setState({ realTimeScore: score, bestScore: score });
+    if (this.isRealtimeScoreBiggerThanBestScore(score)) {
+      this.setState({ realtimeScore: score, bestScore: score });
       this.setBestScoreSession(score);
     } else {
-      this.setState({ realTimeScore: score });
+      this.setState({ realtimeScore: score });
     }
   }
 
@@ -48,7 +41,7 @@ export default class ScoreBoard {
     return bestScore !== null ? bestScore : 0;
   }
 
-  isRealTimeScoreBiggerThanBestScore(score) {
+  isRealtimeScoreBiggerThanBestScore(score) {
     return score > this.state.bestScore;
   }
 }

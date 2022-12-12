@@ -13,65 +13,71 @@ export default class App {
 
   init() {
     const $appContainer = $createElement({ elementType: 'div', className: 'app__container' });
-    const $gameTitleContainer = $createElement({
+    const gameTitleContainer = $createElement({
       elementType: 'div',
       className: 'title__container',
     });
-    const $scoreBoardContainer = $createElement({
+    const scoreBoardContainer = $createElement({
       elementType: 'div',
       className: 'scoreboard__container',
     });
-    const $boardContainer = $createElement({ elementType: 'div', className: 'board__container' });
-    const $controlBoardContainer = $createElement({
+    const boardContainer = $createElement({ elementType: 'div', className: 'board__container' });
+    const controlBoardContainer = $createElement({
       elementType: 'div',
       className: 'control-board__container',
     });
-    const $modal = $createElement({ elementType: 'div', className: 'modal__container-hidden' });
-
-    new GameTitle({ $target: $gameTitleContainer });
-    new ScoreBoard({ $target: $scoreBoardContainer });
-    new Board({
-      $target: $boardContainer,
-      showModal: () => this.#showModal(),
-      setScoreInScoreBoard: (realTimeScore) => this.#setScoreInScoreBoard(realTimeScore),
-      setScoreInModal: (realTimeScore) => this.#setScoreInModal(realTimeScore),
+    const modalContainer = $createElement({
+      elementType: 'div',
+      className: 'modal__container-hidden',
     });
-    new ControlBoard({
-      $target: $controlBoardContainer,
+
+    this.$gameTitle = new GameTitle({ $target: gameTitleContainer });
+    this.$scoreBoard = new ScoreBoard({ $target: scoreBoardContainer });
+    this.$board = new Board({
+      $target: boardContainer,
+      showModal: () => this.#showModal(),
+      setScoreInScoreBoard: (realtimeScore) => this.#setScoreInScoreBoard(realtimeScore),
+      setScoreInModal: (realtimeScore) => this.#setScoreInModal(realtimeScore),
+    });
+    this.$controlBoard = new ControlBoard({
+      $target: controlBoardContainer,
       restartGame: () => this.#restartGame(),
       resetGame: () => this.#resetGame(),
     });
-    new Modal({ $target: $modal, restartGame: () => this.#restartGame() });
+    this.$modal = new Modal({
+      $target: modalContainer,
+      restartGame: () => this.#restartGame(),
+    });
 
-    $appContainer.appendChild($gameTitleContainer);
-    $appContainer.appendChild($scoreBoardContainer);
-    $appContainer.appendChild($boardContainer);
-    $appContainer.appendChild($controlBoardContainer);
+    $appContainer.appendChild(gameTitleContainer);
+    $appContainer.appendChild(scoreBoardContainer);
+    $appContainer.appendChild(boardContainer);
+    $appContainer.appendChild(controlBoardContainer);
 
-    $appContainer.appendChild($modal);
+    $appContainer.appendChild(modalContainer);
 
     this.rootContainer.appendChild($appContainer);
   }
 
-  #setScoreInScoreBoard(realTimeScore) {
-    return this.scoreBoard.setScore(realTimeScore);
+  #setScoreInScoreBoard(realtimeScore) {
+    return this.$scoreBoard.setScore(realtimeScore);
   }
 
-  #setScoreInModal(realTimeScore) {
-    return this.modal.setScore(realTimeScore);
+  #setScoreInModal(realtimeScore) {
+    return this.$modal.setScore(realtimeScore);
   }
 
   #restartGame() {
-    this.board.init();
-    this.scoreBoard.resetRealTimeScore();
+    this.$board.init();
+    this.$scoreBoard.resetRealtimeScore();
   }
 
   #resetGame() {
-    this.board.initGame();
-    this.scoreBoard.init();
+    this.$board.initGame();
+    this.$scoreBoard.init();
   }
 
   #showModal() {
-    this.modal.showModal();
+    this.$modal.showModal();
   }
 }
