@@ -74,7 +74,8 @@ export default class App {
 
   #resetGame() {
     this.$board.initBoard();
-    this.$scoreBoard.init();
+    this.$scoreBoard.resetRealtimeScore();
+    this.$scoreBoard.resetBestScore();
   }
 
   #showModal() {
