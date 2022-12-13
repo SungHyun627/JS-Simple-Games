@@ -162,12 +162,12 @@ body {
   background-color: #0057FF;
 }
 
-.modal__container-hidden {
-  display: none;
+.modal__container {
+  display: block;
 }
 
-.modal__container-show {
-  display: block;
+.modal__container.modal-hidden {
+  display: none;
 }
 
 .modal__background {
@@ -206,12 +206,19 @@ body {
 }
 
 
-.modal__close__icon {
+.modal__close__btn {
   position: absolute;
-  top: 1%;
-  right: 1%;
+  top: 0;
+  right: 0;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border: none;
   cursor: pointer;
-  width: 30px;
+}
+
+.modal__close__icon {
+  width: 25px;
 }
 
 .modal__snake__icon {

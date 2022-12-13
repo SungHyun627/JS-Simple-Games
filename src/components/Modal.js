@@ -1,4 +1,10 @@
 import { MODAL_STATE } from '../constants/constants.js';
+import {
+  getModalCloseBtnElement,
+  getModalRestartBtnElement,
+  getModalStopPlayingBtnElement,
+} from '../utils/elementSelector.js';
+import { hideModal, printModalBestScore, showModal } from '../utils/render.js';
 import { $modalTemplate } from '../utils/templates.js';
 
 export default class Modal {
@@ -7,53 +13,35 @@ export default class Modal {
     this.target = $target;
     this.props = props;
     this.init();
-  }
-
-  setState(newState) {
-    this.state = { ...this.state, ...newState };
-    this.render();
+    this.initEvent();
   }
 
   init() {
     this.target.innerHTML = $modalTemplate;
-    this.initEvent();
+    hideModal(this.target);
+  }
+
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
+    const $modalState = this.state.modalState;
+    const $target = this.target;
+    if ($modalState === MODAL_STATE.HIDDEN) hideModal($target);
+    if ($modalState === MODAL_STATE.SHOW) showModal($target);
   }
 
   initEvent() {
     window.addEventListener('keyup', this.closeModalWithEscapeKey.bind(this));
-    this.target
-      .querySelector('.modal__close__icon')
-      .addEventListener('click', this.closeModal.bind(this));
-    this.target
-      .querySelector('.modal__restart__btn')
-      .addEventListener('click', this.closeModalForRestartGame.bind(this));
-    this.target
-      .querySelector('.modal__stop__playing__btn')
-      .addEventListener('click', this.closeModal.bind(this));
+    const modalCloseBtn = getModalCloseBtnElement(this.target);
+    const modalRestartBtn = getModalRestartBtnElement(this.target);
+    const modalStopPlayingBtn = getModalStopPlayingBtnElement(this.target);
+
+    modalCloseBtn.addEventListener('click', this.closeModal.bind(this));
+    modalRestartBtn.addEventListener('click', this.closeModalForRestartGame.bind(this));
+    modalStopPlayingBtn.addEventListener('click', this.closeModal.bind(this));
   }
 
-  render() {
-    if (this.state.modalState === MODAL_STATE.SHOW) {
-      const modalConatinerDomElement = document.querySelector('.modal__container-hidden');
-      modalConatinerDomElement.classList.remove('modal__container-hidden');
-      modalConatinerDomElement.classList.add('modal__container-show');
-    }
-    if (this.state.modalState === MODAL_STATE.HIDDEN) {
-      const modalConatinerDomElement = document.querySelector('.modal__container-show');
-      modalConatinerDomElement.classList.remove('modal__container-show');
-      modalConatinerDomElement.classList.add('modal__container-hidden');
-    }
-  }
-
-  showModal() {
+  openModal() {
     this.setState({ modalState: MODAL_STATE.SHOW });
-  }
-
-  setScore(realtimeScore) {
-    const modalRealTimeScoreTextElement = document.querySelector('.modal__realtime__score__text');
-    const modalBestScoreTextElement = document.querySelector('.modal__best__score__text');
-    modalRealTimeScoreTextElement.innerHTML = realtimeScore;
-    modalBestScoreTextElement.innerHTML = sessionStorage.getItem('bestScore');
   }
 
   closeModal() {
@@ -68,5 +56,11 @@ export default class Modal {
   closeModalForRestartGame() {
     this.closeModal();
     this.props.restartGame();
+  }
+
+  setScore(realtimeScore) {
+    const $target = this.target;
+    printModalBestScore($target, realtimeScore);
+    printModalBestScore($target);
   }
 }

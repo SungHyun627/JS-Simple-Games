@@ -15,8 +15,8 @@ export default class ScoreBoard {
 
   setState(newState) {
     this.state = { ...this.state, ...newState };
-    printRealTimeScore(this.target, this.state);
-    printBestScore(this.target, this.state);
+    printRealTimeScore(this.target, this.state.realtimeScore);
+    printBestScore(this.target, this.state.bestScore);
   }
 
   resetRealtimeScore() {

@@ -28,7 +28,7 @@ export default class App {
     });
     const modalContainer = $createElement({
       elementType: 'div',
-      className: 'modal__container-hidden',
+      className: 'modal__container',
     });
 
     this.$gameTitle = new GameTitle({ $target: gameTitleContainer });
@@ -79,6 +79,6 @@ export default class App {
   }
 
   #showModal() {
-    this.$modal.showModal();
+    this.$modal.openModal();
   }
 }

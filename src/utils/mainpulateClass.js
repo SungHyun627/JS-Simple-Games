@@ -29,6 +29,10 @@ export const $addAppleClass = (cell) => {
   cell.classList.add('apple__cell');
 };
 
+export const $addModalHideenClass = (modalContainer) => {
+  modalContainer.classList.add('modal-hidden');
+};
+
 export const $removeSnakeClass = (cell) => {
   cell.classList.remove('snake__cell');
 };
@@ -51,4 +55,8 @@ export const $removeSnakeCollisionHeadClass = (cell) => {
 
 export const $removeAppleClass = (cell) => {
   cell.classList.remove('apple__cell');
+};
+
+export const $removeModalHideenClass = (modalContainer) => {
+  modalContainer.classList.remove('modal-hidden');
 };

@@ -7,10 +7,18 @@ import {
   $removeAppleClass,
   $addAppleClass,
   $removeSnakeCollisionHeadClass,
+  $removeModalHideenClass,
+  $addModalHideenClass,
 } from './mainpulateClass.js';
 import { $createAppleIconElement } from './createElements.js';
 import { getDirectionName } from './snakeDirection.js';
-import { getBestScoreElement, getCellElement, getRealtimeScoreElement } from './elementSelector.js';
+import {
+  getBestScoreElement,
+  getCellElement,
+  getModalBestScoreElement,
+  getModalRealtimeScoreElement,
+  getRealtimeScoreElement,
+} from './elementSelector.js';
 
 export const addSnakeCell = (target, snakePos) => {
   const snakeCell = getCellElement(target, snakePos);
@@ -69,12 +77,30 @@ export const removeAppleCell = (target, removedApplePos) => {
   $removeAppleClass(removedAppleCell);
 };
 
-export const printRealTimeScore = (target, state) => {
+export const printRealTimeScore = (target, realtimeScore) => {
   const realtimeScoreElement = getRealtimeScoreElement(target);
-  realtimeScoreElement.innerHTML = state.realtimeScore;
+  realtimeScoreElement.innerHTML = realtimeScore;
 };
 
-export const printBestScore = (target, state) => {
+export const printBestScore = (target, bestScore) => {
   const bestScoreElement = getBestScoreElement(target);
-  bestScoreElement.innerHTML = state.bestScore;
+  bestScoreElement.innerHTML = bestScore;
+};
+
+export const printModalRealTimeScore = (target, realtimeScore) => {
+  const modalRealtimeScoreElement = getModalRealtimeScoreElement(target);
+  modalRealtimeScoreElement.innerHTML = realtimeScore;
+};
+
+export const printModalBestScore = (target) => {
+  const modalBestScoreElement = getModalBestScoreElement(target);
+  modalBestScoreElement.innerHTML = sessionStorage.getItem('bestScore');
+};
+
+export const showModal = (modalContainer) => {
+  $removeModalHideenClass(modalContainer);
+};
+
+export const hideModal = (modalContainer) => {
+  $addModalHideenClass(modalContainer);
 };

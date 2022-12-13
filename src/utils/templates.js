@@ -17,7 +17,9 @@ export const $scoreBoardTemplate = `
 export const $modalTemplate = `
   <div class="modal__background"></div>
   <div class="modal__wrapper">
-    <img class="modal__close__icon" src="src/assets/close-icon.svg">
+    <button class="modal__close__btn">
+      <img class="modal__close__icon" src="src/assets/close-icon.svg"/>
+    </button>
     <img class="modal__snake__icon" src="src/assets/snake-icon-black.svg">
     <div class="modal__gameover__text">Game Over</div>
     <div class="modal__score__result">
