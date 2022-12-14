@@ -4,8 +4,13 @@ import {
   getModalRestartBtnElement,
   getModalStopPlayingBtnElement,
 } from '../utils/elementSelector.js';
-import { hideModal, printModalBestScore, showModal } from '../utils/render.js';
-import { $modalTemplate } from '../utils/templates.js';
+import {
+  printModalRealTimeScore,
+  printModalBestScore,
+  showModal,
+  hideModal,
+} from '../utils/render.js';
+import { $modalTemplate } from '../templates/templates.js';
 
 export default class Modal {
   constructor({ $target, ...props }) {
@@ -60,7 +65,7 @@ export default class Modal {
 
   setScore(realtimeScore) {
     const $target = this.target;
-    printModalBestScore($target, realtimeScore);
+    printModalRealTimeScore($target, realtimeScore);
     printModalBestScore($target);
   }
 }

@@ -1,5 +1,5 @@
 import { getResetBtnElement, getRestartBtnElement } from '../utils/elementSelector.js';
-import { $controlBoardTemplate } from '../utils/templates.js';
+import { $controlBoardTemplate } from '../templates/templates.js';
 
 export default class ControlBoard {
   constructor({ $target, ...props }) {

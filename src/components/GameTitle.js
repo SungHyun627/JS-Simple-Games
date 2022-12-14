@@ -1,4 +1,4 @@
-import { $gameTitleTemplate } from '../utils/templates.js';
+import { $gameTitleTemplate } from '../templates/templates.js';
 
 export default class GameTitle {
   constructor({ $target }) {

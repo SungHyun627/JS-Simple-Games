@@ -1,5 +1,6 @@
 import { printBestScore, printRealTimeScore } from '../utils/render.js';
-import { $scoreBoardTemplate } from '../utils/templates.js';
+import { setBestScoreInSession, getBestScoreFromSession } from '../utils/sessionStorage.js';
+import { $scoreBoardTemplate } from '../templates/templates.js';
 
 export default class ScoreBoard {
   constructor({ $target }) {
@@ -10,7 +11,7 @@ export default class ScoreBoard {
 
   init() {
     this.target.innerHTML = $scoreBoardTemplate;
-    this.setState({ realtimeScore: 0, bestScore: this.getBestScoreFromSession() });
+    this.setState({ realtimeScore: 0, bestScore: getBestScoreFromSession() });
   }
 
   setState(newState) {
@@ -25,26 +26,16 @@ export default class ScoreBoard {
 
   resetBestScore() {
     this.setBestScoreInSession(0);
-    this.setState({ bestScore: this.getBestScoreFromSession() });
+    this.setState({ bestScore: getBestScoreFromSession() });
   }
 
   setScore(score) {
     if (this.isRealtimeScoreBiggerThanBestScore(score)) {
       this.setState({ realtimeScore: score, bestScore: score });
-      this.setBestScoreInSession(score);
+      setBestScoreInSession(score);
     } else {
       this.setState({ realtimeScore: score });
     }
-  }
-
-  setBestScoreInSession(bestScore) {
-    sessionStorage.setItem('bestScore', bestScore);
-  }
-
-  getBestScoreFromSession() {
-    const bestScore = sessionStorage.getItem('bestScore');
-    if (bestScore === null) this.setBestScoreInSession(0);
-    return bestScore !== null ? sessionStorage.getItem('bestScore') : 0;
   }
 
   isRealtimeScoreBiggerThanBestScore(score) {
