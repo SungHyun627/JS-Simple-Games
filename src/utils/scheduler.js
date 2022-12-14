@@ -2,7 +2,7 @@ export class Scheduler {
   constructor(callback, interval) {
     this.callback = callback;
     this.isEnd = false;
-    this.id = null;
+    this.timerId = null;
     this.interval = interval;
   }
 
@@ -14,11 +14,11 @@ export class Scheduler {
   play() {
     setTimeout(() => {
       if (this.isEnd) {
-        this.id = null;
+        this.timerId = null;
         return;
       }
-      if (this.id !== null) clearTimeout(this.id);
-      this.id = this.callback();
+      if (this.timerId !== null) clearTimeout(this.timerId);
+      this.timerId = this.callback();
       this.play();
     }, this.interval);
   }
