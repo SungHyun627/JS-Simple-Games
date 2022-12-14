@@ -16,7 +16,17 @@ export default class ControlBoard {
   initEvent() {
     const restartBtnElement = getRestartBtnElement(this.target);
     const resetBtnElement = getResetBtnElement(this.target);
-    restartBtnElement.addEventListener('click', () => this.props.restartGame());
-    resetBtnElement.addEventListener('click', () => this.props.resetGame());
+    restartBtnElement.addEventListener('click', () => {
+      this.props.restartGame();
+      this.removeButtonFocus(restartBtnElement);
+    });
+    resetBtnElement.addEventListener('click', () => {
+      this.props.resetGame();
+      this.removeButtonFocus(resetBtnElement);
+    });
+  }
+
+  removeButtonFocus(btn) {
+    btn.blur();
   }
 }
