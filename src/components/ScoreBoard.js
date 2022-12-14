@@ -16,6 +16,10 @@ export default class ScoreBoard {
 
   setState(newState) {
     this.state = { ...this.state, ...newState };
+    this.render();
+  }
+
+  render() {
     printRealTimeScore(this.target, this.state.realtimeScore);
     printBestScore(this.target, this.state.bestScore);
   }
@@ -25,7 +29,7 @@ export default class ScoreBoard {
   }
 
   resetBestScore() {
-    this.setBestScoreInSession(0);
+    setBestScoreInSession(0);
     this.setState({ bestScore: getBestScoreFromSession() });
   }
 

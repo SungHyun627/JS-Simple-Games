@@ -77,6 +77,17 @@ export const removeAppleCell = (target, removedApplePos) => {
   $removeAppleClass(removedAppleCell);
 };
 
+export const removePreSnakeAndAppleCells = (target, state) => {
+  const $allSnakePos = state.snakeQueue;
+  const $snakeHeadPos = state.snakeQueue[0];
+  const $applePos = state.applePos;
+
+  removeAllSnakeCell(target, $allSnakePos);
+  removeSnakeHeadCell(target, $snakeHeadPos);
+  removeSnakeCollisionHeadCell(target, $snakeHeadPos);
+  removeAppleCell(target, $applePos);
+};
+
 export const printRealTimeScore = (target, realtimeScore) => {
   const realtimeScoreElement = getRealtimeScoreElement(target);
   realtimeScoreElement.innerHTML = realtimeScore;
@@ -103,4 +114,46 @@ export const showModal = (modalContainer) => {
 
 export const hideModal = (modalContainer) => {
   $addModalHideenClass(modalContainer);
+};
+
+export const initSnakeAndAppleRender = (target, state) => {
+  const $allSnakePos = state.snakeQueue;
+  const $applePos = state.applePos;
+  const $snakeHeadPos = state.snakeQueue[0];
+  const $direction = state.direction;
+  addAllSnakeCell(target, $allSnakePos);
+  addSnakeHeadCell(target, $snakeHeadPos, $direction);
+  addAppleCell(target, $applePos);
+};
+
+export const moveForWardRender = (target, state) => {
+  const $removedSnakeHeadPos = state.snakeQueue[1];
+  const $direction = state.direction;
+  const $removedSnakePos = state.removedSnakePos;
+  const $addedSnakePos = state.snakeQueue[0];
+  removeSnakeHeadCell(target, $removedSnakeHeadPos);
+  removeSnakeCell(target, $removedSnakePos);
+  addSnakeCell(target, $addedSnakePos);
+  addSnakeHeadCell(target, $addedSnakePos, $direction);
+};
+
+export const collisionRender = (target, state) => {
+  const $snakeHeadPos = state.snakeQueue[0];
+  const $direction = state.direction;
+  removeSnakeHeadCell(target, $snakeHeadPos, $direction);
+  addSnakeCollisionHeadCell(target, $snakeHeadPos, $direction);
+};
+
+export const getAppleRender = (target, state) => {
+  const $removedApplePos = state.removedApplePos;
+  const $applePos = state.applePos;
+  const $addedSnakePos = state.snakeQueue[0];
+  const $direction = state.direction;
+  const $removedSnakeHeadPos = state.snakeQueue[1];
+
+  removeAppleCell(target, $removedApplePos);
+  addAppleCell(target, $applePos);
+  addSnakeCell(target, $addedSnakePos);
+  addSnakeHeadCell(target, $addedSnakePos, $direction);
+  removeSnakeHeadCell(target, $removedSnakeHeadPos);
 };

@@ -1,91 +1,65 @@
 import {
-  BOARD_ROW_LENGTH,
   GAME_STATE,
   INTERVAL_TIME,
   EVENT_TYPE,
-  INITIAL_SNAKE_LENGTH,
+  INITIAL_BOARD_STATE,
 } from '../constants/constants.js';
-import { directions, isSameDirection, isReverseDirection } from '../utils/snakeDirection.js';
-import { $createCellElement } from '../utils/createElements.js';
-import { createApplePos, comparePos } from '../utils/createApplePosition.js';
+import { directions } from '../utils/snakeDirection.js';
+import { createApplePos } from '../utils/createApplePosition.js';
 import { Scheduler } from '../utils/scheduler.js';
-import { $addBoardClass, $addEvenOddClass } from '../utils/mainpulateClass.js';
 import {
-  addSnakeCell,
-  addSnakeHeadCell,
-  removeSnakeHeadCell,
-  removeSnakeCell,
-  addSnakeCollisionHeadCell,
-  addAppleCell,
-  removeAppleCell,
-  removeAllSnakeCell,
-  removeSnakeCollisionHeadCell,
-  addAllSnakeCell,
+  moveForWardRender,
+  collisionRender,
+  getAppleRender,
+  removePreSnakeAndAppleCells,
+  initSnakeAndAppleRender,
 } from '../utils/render.js';
 import { debounce } from '../utils/debounce.js';
 import { copySnakeQueue } from '../utils/copySnakeQueue.js';
-import { isBeforeGameStart, isPlayingGame } from '../utils/gameState.js';
-import { getCellPos, getNextSnakeHeadPos } from '../utils/getPositions.js';
-
-const initialBoardState = {
-  snakeQueue: [
-    { x: 9, y: 6 },
-    { x: 9, y: 5 },
-    { x: 9, y: 4 },
-  ],
-  direction: 0,
-  removedApplePos: null,
-  removedSnakePos: null,
-  gameState: GAME_STATE.BEFORE_START,
-};
+import { getNextSnakeHeadPos } from '../utils/getPositions.js';
+import { $emptyBoardTemplate } from '../templates/templates.js';
+import { getScore } from '../utils/getScore.js';
+import {
+  isSnakeGetApple,
+  isCollidingWithWall,
+  isCollidingWithSnakeBody,
+  isSatisfyingChangeDirectionCondition,
+  isSatisfyingGameStartCondition,
+} from '../utils/validation.js';
 
 export default class Board {
   constructor({ $target, ...props }) {
     this.state = {
-      ...initialBoardState,
-      applePos: { ...createApplePos(initialBoardState.snakeQueue) },
+      ...INITIAL_BOARD_STATE,
+      applePos: { ...createApplePos(INITIAL_BOARD_STATE.snakeQueue) },
     };
     this.props = props;
     this.target = $target;
     this.scheduler = new Scheduler(this.moveSnake.bind(this), INTERVAL_TIME);
-    this.initBoardTemplate();
-    this.init();
+    this.initEmptyBoardTemplate(this.target);
+    initSnakeAndAppleRender(this.target, this.state);
     this.initEvent();
   }
 
-  init() {
-    const $allSnakePos = this.state.snakeQueue;
-    const $applePos = this.state.applePos;
-    const $snakeHeadPos = this.state.snakeQueue[0];
-    const $direction = this.state.direction;
-    addAllSnakeCell(this.target, $allSnakePos);
-    addSnakeHeadCell(this.target, $snakeHeadPos, $direction);
-    addAppleCell(this.target, $applePos);
+  initEmptyBoardTemplate(target) {
+    $emptyBoardTemplate(target);
   }
 
   setState(newState, eventType) {
     this.state = { ...this.state, ...newState };
-    if (eventType === EVENT_TYPE.MOVE_FORWARD) this.moveForWard();
+    this.render(eventType);
+  }
+
+  render(eventType) {
+    if (eventType === EVENT_TYPE.MOVE_FORWARD) moveForWardRender(this.target, this.state);
     if (
       eventType === EVENT_TYPE.COLLIDE_WITH_WALL ||
       eventType === EVENT_TYPE.COLLIDE_WITH_SNAKE_BODY
     )
-      this.collision();
-    if (eventType === EVENT_TYPE.GET_APPLE) this.getApple();
-    if (eventType === EVENT_TYPE.INIT) this.init();
-  }
-
-  initBoardTemplate() {
-    const boardArr = new Array(BOARD_ROW_LENGTH ** 2).fill('empty');
-
-    boardArr.forEach((_, idx) => {
-      const { rowIdx, colIdx } = { ...getCellPos(idx) };
-
-      const cell = $createCellElement(rowIdx, colIdx);
-      $addBoardClass(cell);
-      $addEvenOddClass(cell, rowIdx, colIdx);
-      this.target.appendChild(cell);
-    });
+      collisionRender(this.target, this.state);
+    if (eventType === EVENT_TYPE.GET_APPLE) getAppleRender(this.target, this.state);
+    if (eventType === EVENT_TYPE.INIT_SNAKE_AND_APPLE)
+      initSnakeAndAppleRender(this.target, this.state);
   }
 
   initEvent() {
@@ -95,25 +69,19 @@ export default class Board {
     );
   }
 
-  initBoard() {
-    const $target = this.target;
-    const $allSnakePos = this.state.snakeQueue;
-    const $snakeHeadPos = this.state.snakeQueue[0];
-    const $applePos = this.state.applePos;
+  clearBoard() {
+    removePreSnakeAndAppleCells(this.target, this.state);
+  }
 
-    removeAllSnakeCell($target, $allSnakePos);
-    removeSnakeHeadCell($target, $snakeHeadPos);
-    removeSnakeCollisionHeadCell($target, $snakeHeadPos);
-    removeAppleCell($target, $applePos);
-
-    this.scheduler.end();
+  initBoardState() {
+    this.endTimer();
     this.setState(
       {
-        ...initialBoardState,
-        appleCell: { ...createApplePos(initialBoardState.snakeQueue) },
+        ...INITIAL_BOARD_STATE,
+        applePos: { ...createApplePos(INITIAL_BOARD_STATE.snakeQueue) },
         gameState: GAME_STATE.BEFORE_START,
       },
-      EVENT_TYPE.INIT
+      EVENT_TYPE.INIT_SNAKE_AND_APPLE
     );
   }
 
@@ -127,19 +95,12 @@ export default class Board {
   }
 
   getDirection(e) {
-    if (
-      isBeforeGameStart(this.state.gameState) &&
-      !isReverseDirection(e.key, this.state.direction)
-    ) {
+    if (isSatisfyingGameStartCondition(e, this.state.gameState, this.state.direction)) {
       this.startGame(e);
       return;
     }
 
-    if (
-      isPlayingGame(this.state.gameState) &&
-      !isSameDirection(e.key, this.state.direction) &&
-      !isReverseDirection(e.key, this.state.direction)
-    )
+    if (isSatisfyingChangeDirectionCondition(e, this.state.gameState, this.state.direction))
       this.changeDirection(e);
   }
 
@@ -149,44 +110,58 @@ export default class Board {
       this.state.snakeQueue[0].y,
       this.state.direction
     );
-    if (this.isCollideWithWall(nextHeadPosX, nextHeadPosY)) {
-      this.setState({ gameState: GAME_STATE.GAME_OVER }, EVENT_TYPE.COLLIDE_WITH_WALL);
-      this.gameOver();
-      return;
-    }
-
-    if (
-      this.isCollideWithSnakeBody(nextHeadPosX, nextHeadPosY, this.state.snakeQueue.slice(0, -1))
-    ) {
-      this.setState(
-        {
-          gameState: GAME_STATE.GAME_OVER,
-        },
-        EVENT_TYPE.COLLIDE_WITH_SNAKE_BODY
-      );
-      this.gameOver();
-      return;
-    }
 
     const nextSnakeQueue = copySnakeQueue(this.state.snakeQueue);
     nextSnakeQueue.unshift({ x: nextHeadPosX, y: nextHeadPosY });
 
-    if (this.isSnakeGetApple(nextHeadPosX, nextHeadPosY)) {
-      this.setState(
-        {
-          snakeQueue: copySnakeQueue(nextSnakeQueue),
-          applePos: {
-            ...createApplePos(nextSnakeQueue),
-          },
-          removedApplePos: { ...this.state.applePos },
-        },
-        EVENT_TYPE.GET_APPLE
-      );
-      const realTimeScore = this.getScore();
-      this.props.setScoreInScoreBoard(realTimeScore);
+    if (isCollidingWithWall(nextHeadPosX, nextHeadPosY)) {
+      this.collideWithWall();
       return;
     }
 
+    if (isCollidingWithSnakeBody(nextHeadPosX, nextHeadPosY, nextSnakeQueue.slice(1, -1))) {
+      this.collideWithSnakeBody();
+      return;
+    }
+
+    if (isSnakeGetApple(nextHeadPosX, nextHeadPosY, this.state.applePos)) {
+      this.getApple(nextSnakeQueue);
+      return;
+    }
+    this.moveForWard(nextSnakeQueue);
+  }
+
+  collideWithWall() {
+    this.setState({ gameState: GAME_STATE.GAME_OVER }, EVENT_TYPE.COLLIDE_WITH_WALL);
+    this.gameOver();
+  }
+
+  collideWithSnakeBody() {
+    this.setState(
+      {
+        gameState: GAME_STATE.GAME_OVER,
+      },
+      EVENT_TYPE.COLLIDE_WITH_SNAKE_BODY
+    );
+    this.gameOver();
+  }
+
+  getApple(nextSnakeQueue) {
+    this.setState(
+      {
+        snakeQueue: copySnakeQueue(nextSnakeQueue),
+        applePos: {
+          ...createApplePos(nextSnakeQueue),
+        },
+        removedApplePos: { ...this.state.applePos },
+      },
+      EVENT_TYPE.GET_APPLE
+    );
+    const realTimeScore = getScore(this.state);
+    this.props.setScoreInScoreBoard(realTimeScore);
+  }
+
+  moveForWard(nextSnakeQueue) {
     const nextRemovedSnakePos = nextSnakeQueue.pop();
     this.setState(
       {
@@ -195,38 +170,6 @@ export default class Board {
       },
       EVENT_TYPE.MOVE_FORWARD
     );
-  }
-
-  moveForWard() {
-    const $removedSnakeHeadPos = this.state.snakeQueue[1];
-    const $direction = this.state.direction;
-    const $removedSnakePos = this.state.removedSnakePos;
-    const $addedSnakePos = this.state.snakeQueue[0];
-    removeSnakeHeadCell(this.target, $removedSnakeHeadPos);
-    removeSnakeCell(this.target, $removedSnakePos);
-    addSnakeCell(this.target, $addedSnakePos);
-    addSnakeHeadCell(this.target, $addedSnakePos, $direction);
-  }
-
-  collision() {
-    const $snakeHeadPos = this.state.snakeQueue[0];
-    const $direction = this.state.direction;
-    removeSnakeHeadCell(this.target, $snakeHeadPos, $direction);
-    addSnakeCollisionHeadCell(this.target, $snakeHeadPos, $direction);
-  }
-
-  getApple() {
-    const $removedApplePos = this.state.removedApplePos;
-    const $applePos = this.state.applePos;
-    const $addedSnakePos = this.state.snakeQueue[0];
-    const $direction = this.state.direction;
-    const $removedSnakeHeadPos = this.state.snakeQueue[1];
-
-    removeAppleCell(this.target, $removedApplePos);
-    addAppleCell(this.target, $applePos);
-    addSnakeCell(this.target, $addedSnakePos);
-    addSnakeHeadCell(this.target, $addedSnakePos, $direction);
-    removeSnakeHeadCell(this.target, $removedSnakeHeadPos);
   }
 
   startGame(e) {
@@ -240,34 +183,18 @@ export default class Board {
     this.startTimer();
   }
 
+  gameOver() {
+    this.endTimer();
+    const realTimeScore = getScore(this.state);
+    this.props.setScoreInModal(realTimeScore);
+    this.props.showModal();
+  }
+
   startTimer() {
     this.scheduler.start();
   }
 
   endTimer() {
     this.scheduler.end();
-  }
-
-  gameOver() {
-    this.endTimer();
-    const realTimeScore = this.getScore();
-    this.props.setScoreInModal(realTimeScore);
-    this.props.showModal();
-  }
-
-  isSnakeGetApple(posX, posY) {
-    return posX === this.state.applePos.x && posY === this.state.applePos.y;
-  }
-
-  isCollideWithWall(posX, posY) {
-    return posX < 0 || posX >= BOARD_ROW_LENGTH || posY < 0 || posY >= BOARD_ROW_LENGTH;
-  }
-
-  isCollideWithSnakeBody(posX, posY, queue) {
-    return queue.some((pos) => comparePos(pos, { x: posX, y: posY }));
-  }
-
-  getScore() {
-    return this.state.snakeQueue.length - INITIAL_SNAKE_LENGTH;
   }
 }

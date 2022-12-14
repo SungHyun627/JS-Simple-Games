@@ -1,3 +1,8 @@
+import { $addBoardClass, $addEvenOddClass } from '../utils/mainpulateClass.js';
+import { $createCellElement } from '../utils/createElements.js';
+import { BOARD_ROW_LENGTH } from '../constants/constants.js';
+import { getCellPos } from '../utils/getPositions.js';
+
 export const $gameTitleTemplate = `
   <img class="snake__icon" src="src/assets/snake-icon-white.svg">
   <div class="title__text">Snake Game</div>
@@ -42,3 +47,16 @@ export const $controlBoardTemplate = `
   <button class="restart__btn">Restart</button>
   <button class="reset__btn">Reset</button>
 `;
+
+export const $emptyBoardTemplate = (target) => {
+  const boardArr = new Array(BOARD_ROW_LENGTH ** 2).fill('empty');
+
+  boardArr.forEach((_, idx) => {
+    const { rowIdx, colIdx } = { ...getCellPos(idx) };
+
+    const cell = $createCellElement(rowIdx, colIdx);
+    $addBoardClass(cell);
+    $addEvenOddClass(cell, rowIdx, colIdx);
+    target.appendChild(cell);
+  });
+};

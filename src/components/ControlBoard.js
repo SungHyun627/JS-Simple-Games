@@ -6,11 +6,11 @@ export default class ControlBoard {
     this.target = $target;
     this.props = props;
     this.init();
+    this.initEvent();
   }
 
   init() {
     this.target.innerHTML = $controlBoardTemplate;
-    this.initEvent();
   }
 
   initEvent() {

@@ -1,6 +1,7 @@
 import { directionArr } from './snakeDirection.js';
 import { BOARD_ROW_LENGTH } from '../constants/constants.js';
 
+export const comparePos = (x, y) => JSON.stringify(x) === JSON.stringify(y);
 export const getCellPos = (cellIdx) => {
   return { rowIdx: parseInt(cellIdx / BOARD_ROW_LENGTH, 10), colIdx: cellIdx % BOARD_ROW_LENGTH };
 };

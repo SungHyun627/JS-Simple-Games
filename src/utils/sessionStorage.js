@@ -2,6 +2,6 @@ export const setBestScoreInSession = (bestScore) => sessionStorage.setItem('best
 
 export const getBestScoreFromSession = () => {
   const bestScore = sessionStorage.getItem('bestScore');
-  if (bestScore === null) this.setBestScoreInSession(0);
+  if (bestScore === null) setBestScoreInSession(0);
   return bestScore !== null ? sessionStorage.getItem('bestScore') : 0;
 };

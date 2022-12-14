@@ -68,12 +68,14 @@ export default class App {
   }
 
   #restartGame() {
-    this.$board.initBoard();
+    this.$board.clearBoard();
+    this.$board.initBoardState();
     this.$scoreBoard.resetRealtimeScore();
   }
 
   #resetGame() {
-    this.$board.initBoard();
+    this.$board.clearBoard();
+    this.$board.initBoardState();
     this.$scoreBoard.resetRealtimeScore();
     this.$scoreBoard.resetBestScore();
   }
