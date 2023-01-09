@@ -51,15 +51,22 @@ export default class Board {
   }
 
   render(eventType) {
-    if (eventType === EVENT_TYPE.MOVE_FORWARD) moveForWardRender(this.target, this.state);
-    if (
-      eventType === EVENT_TYPE.COLLIDE_WITH_WALL ||
-      eventType === EVENT_TYPE.COLLIDE_WITH_SNAKE_BODY
-    )
-      collisionRender(this.target, this.state);
-    if (eventType === EVENT_TYPE.GET_APPLE) getAppleRender(this.target, this.state);
-    if (eventType === EVENT_TYPE.INIT_SNAKE_AND_APPLE)
-      initSnakeAndAppleRender(this.target, this.state);
+    switch (eventType) {
+      case EVENT_TYPE.MOVE_FORWARD:
+        moveForWardRender(this.target, this.state);
+        break;
+      case EVENT_TYPE.COLLIDE_WITH_WALL || EVENT_TYPE.COLLIDE_WITH_SNAKE_BODY:
+        collisionRender(this.target, this.state);
+        break;
+      case EVENT_TYPE.GET_APPLE:
+        getAppleRender(this.target, this.state);
+        break;
+      case EVENT_TYPE.INIT_SNAKE_AND_APPLE:
+        initSnakeAndAppleRender(this.target, this.state);
+        break;
+      default:
+        break;
+    }
   }
 
   initEvent() {
