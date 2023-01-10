@@ -1,7 +1,7 @@
 import {
   GAME_STATE,
   INTERVAL_TIME,
-  EVENT_TYPE,
+  SNAKE_STATE,
   INITIAL_BOARD_STATE,
 } from '../constants/constants.js';
 import { directions } from '../utils/snakeDirection.js';
@@ -45,23 +45,23 @@ export default class Board {
     $emptyBoardTemplate(target);
   }
 
-  setState(newState, eventType) {
+  setState(newState) {
     this.state = { ...this.state, ...newState };
-    this.render(eventType);
+    this.render();
   }
 
-  render(eventType) {
-    switch (eventType) {
-      case EVENT_TYPE.MOVE_FORWARD:
+  render() {
+    switch (this.state.snakeState) {
+      case SNAKE_STATE.MOVE_FORWARD:
         moveForWardRender(this.target, this.state);
         break;
-      case EVENT_TYPE.COLLIDE_WITH_WALL || EVENT_TYPE.COLLIDE_WITH_SNAKE_BODY:
+      case SNAKE_STATE.COLLIDE_WITH_WALL || SNAKE_STATE.COLLIDE_WITH_SNAKE_BODY:
         collisionRender(this.target, this.state);
         break;
-      case EVENT_TYPE.GET_APPLE:
+      case SNAKE_STATE.GET_APPLE:
         getAppleRender(this.target, this.state);
         break;
-      case EVENT_TYPE.INIT_SNAKE_AND_APPLE:
+      case SNAKE_STATE.STAND_STILL:
         initSnakeAndAppleRender(this.target, this.state);
         break;
       default:
@@ -82,23 +82,19 @@ export default class Board {
 
   initBoardState() {
     this.endTimer();
-    this.setState(
-      {
-        ...INITIAL_BOARD_STATE,
-        applePos: { ...createApplePos(INITIAL_BOARD_STATE.snakeQueue) },
-        gameState: GAME_STATE.BEFORE_START,
-      },
-      EVENT_TYPE.INIT_SNAKE_AND_APPLE
-    );
+    this.setState({
+      ...INITIAL_BOARD_STATE,
+      applePos: { ...createApplePos(INITIAL_BOARD_STATE.snakeQueue) },
+      gameState: GAME_STATE.BEFORE_START,
+      snakeState: SNAKE_STATE.STAND_STILL,
+    });
   }
 
   changeDirection(e) {
-    this.setState(
-      {
-        direction: directions[e.key.replace('Arrow', '')],
-      },
-      EVENT_TYPE.CHANGE_DIRECTION
-    );
+    this.setState({
+      direction: directions[e.key.replace('Arrow', '')],
+      snakeState: SNAKE_STATE.CHANGE_DIRECTION,
+    });
   }
 
   getDirection(e) {
@@ -139,54 +135,46 @@ export default class Board {
   }
 
   collideWithWall() {
-    this.setState({ gameState: GAME_STATE.GAME_OVER }, EVENT_TYPE.COLLIDE_WITH_WALL);
+    this.setState({ gameState: GAME_STATE.GAME_OVER, snakeState: SNAKE_STATE.COLLIDE_WITH_WALL });
     this.gameOver();
   }
 
   collideWithSnakeBody() {
-    this.setState(
-      {
-        gameState: GAME_STATE.GAME_OVER,
-      },
-      EVENT_TYPE.COLLIDE_WITH_SNAKE_BODY
-    );
+    this.setState({
+      gameState: GAME_STATE.GAME_OVER,
+      snakeState: SNAKE_STATE.COLLIDE_WITH_SNAKE_BODY,
+    });
     this.gameOver();
   }
 
   getApple(nextSnakeQueue) {
-    this.setState(
-      {
-        snakeQueue: copySnakeQueue(nextSnakeQueue),
-        applePos: {
-          ...createApplePos(nextSnakeQueue),
-        },
-        removedApplePos: { ...this.state.applePos },
+    this.setState({
+      snakeQueue: copySnakeQueue(nextSnakeQueue),
+      applePos: {
+        ...createApplePos(nextSnakeQueue),
       },
-      EVENT_TYPE.GET_APPLE
-    );
+      removedApplePos: { ...this.state.applePos },
+      snakeState: SNAKE_STATE.GET_APPLE,
+    });
     const realTimeScore = getScore(this.state);
     this.props.setScoreInScoreBoard(realTimeScore);
   }
 
   moveForWard(nextSnakeQueue) {
     const nextRemovedSnakePos = nextSnakeQueue.pop();
-    this.setState(
-      {
-        snakeQueue: copySnakeQueue(nextSnakeQueue),
-        removedSnakePos: nextRemovedSnakePos,
-      },
-      EVENT_TYPE.MOVE_FORWARD
-    );
+    this.setState({
+      snakeQueue: copySnakeQueue(nextSnakeQueue),
+      removedSnakePos: nextRemovedSnakePos,
+      snakeState: SNAKE_STATE.MOVE_FORWARD,
+    });
   }
 
   startGame(e) {
-    this.setState(
-      {
-        gameState: GAME_STATE.PLAYING,
-        direction: directions[e.key.replace('Arrow', '')],
-      },
-      EVENT_TYPE.CHANGE_DIRECTION
-    );
+    this.setState({
+      gameState: GAME_STATE.PLAYING,
+      direction: directions[e.key.replace('Arrow', '')],
+      snakeState: SNAKE_STATE.CHANGE_DIRECTION,
+    });
     this.startTimer();
   }
 
