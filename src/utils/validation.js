@@ -1,6 +1,6 @@
 import { comparePos } from './getPositions.js';
 import { BOARD_ROW_LENGTH, GAME_STATE } from '../constants/constants.js';
-import { isReverseDirection, isSameDirection } from './snakeDirection.js';
+import { directionKeys } from './snakeDirection.js';
 
 export const isSnakeGetApple = (posX, posY, applePos) => {
   return posX === applePos.x && posY === applePos.y;
@@ -20,6 +20,17 @@ export const isBeforeGameStart = (gameState) => {
 
 export const isPlayingGame = (gameState) => {
   return gameState === GAME_STATE.PLAYING;
+};
+
+export const isSameDirection = (key, direction) => {
+  return key === directionKeys[direction];
+};
+export const isReverseDirection = (key, direction) => {
+  return key === directionKeys[(direction + 2) % 4];
+};
+
+export const isDirectionKeycode = (key) => {
+  return directionKeys.includes(key);
 };
 
 export const isSatisfyingGameStartCondition = (e, gameState, direction) => {

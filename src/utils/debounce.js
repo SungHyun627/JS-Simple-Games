@@ -1,4 +1,4 @@
-import { isDirectionKeycode } from './snakeDirection.js';
+import { isDirectionKeycode } from './validation.js';
 
 export const debounce = (callback, delay) => {
   let timerId;

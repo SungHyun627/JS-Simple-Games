@@ -7,17 +7,6 @@ export const directionArr = [
   [-1, 0],
 ];
 
-export const isSameDirection = (key, direction) => {
-  return key === directionKeys[direction];
-};
-export const isReverseDirection = (key, direction) => {
-  return key === directionKeys[(direction + 2) % 4];
-};
-
-export const isDirectionKeycode = (key) => {
-  return directionKeys.includes(key);
-};
-
 export const getDirectionName = (direction) => {
   return Object.keys(directions).find((key) => directions[key] === direction);
 };
