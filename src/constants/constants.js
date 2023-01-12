@@ -15,7 +15,6 @@ export const SNAKE_STATE = {
   GET_APPLE: 'Get Apple',
   COLLIDE_WITH_WALL: 'Collide With Wall',
   COLLIDE_WITH_SNAKE_BODY: 'Collide With Snake Body',
-  INIT_SNAKE_AND_APPLE: 'Init Snake and Apple',
 };
 
 export const INITIAL_BOARD_STATE = {
