@@ -55,7 +55,10 @@ export default class Board {
       case SNAKE_STATE.MOVE_FORWARD:
         moveForWardRender(this.target, this.state);
         break;
-      case SNAKE_STATE.COLLIDE_WITH_WALL || SNAKE_STATE.COLLIDE_WITH_SNAKE_BODY:
+      case SNAKE_STATE.COLLIDE_WITH_WALL:
+        collisionRender(this.target, this.state);
+        break;
+      case SNAKE_STATE.COLLIDE_WITH_SNAKE_BODY:
         collisionRender(this.target, this.state);
         break;
       case SNAKE_STATE.GET_APPLE:
