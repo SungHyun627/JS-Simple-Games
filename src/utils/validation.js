@@ -33,3 +33,7 @@ export const isSatisfyingChangeDirectionCondition = (e, gameState, direction) =>
     !isReverseDirection(e.key, direction)
   );
 };
+
+export const isRealtimeScoreBiggerThanBestScore = (realtimeScore, bestScore) => {
+  return realtimeScore > bestScore;
+};

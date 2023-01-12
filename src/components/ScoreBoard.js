@@ -1,6 +1,7 @@
 import { printBestScore, printRealTimeScore } from '../utils/render.js';
 import { setBestScoreInSession, getBestScoreFromSession } from '../utils/sessionStorage.js';
 import { $scoreBoardTemplate } from '../templates/templates.js';
+import { isRealtimeScoreBiggerThanBestScore } from '../utils/validation.js';
 
 export default class ScoreBoard {
   constructor({ $target }) {
@@ -34,15 +35,11 @@ export default class ScoreBoard {
   }
 
   setScore(score) {
-    if (this.isRealtimeScoreBiggerThanBestScore(score)) {
+    if (isRealtimeScoreBiggerThanBestScore(score, this.state.bestScore)) {
       this.setState({ realtimeScore: score, bestScore: score });
       setBestScoreInSession(score);
     } else {
       this.setState({ realtimeScore: score });
     }
-  }
-
-  isRealtimeScoreBiggerThanBestScore(score) {
-    return score > this.state.bestScore;
   }
 }
