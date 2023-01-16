@@ -159,8 +159,7 @@ export default class Board {
       removedApplePos: { ...this.state.applePos },
       snakeState: SNAKE_STATE.GET_APPLE,
     });
-    const realTimeScore = getScore(this.state);
-    this.props.setScoreInScoreBoard(realTimeScore);
+    this.props.setScoreInScoreBoard();
   }
 
   moveForWard(nextSnakeQueue) {

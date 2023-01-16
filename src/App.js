@@ -36,7 +36,7 @@ export default class App {
     this.$board = new Board({
       $target: boardContainer,
       showModal: () => this.#showModal(),
-      setScoreInScoreBoard: (realtimeScore) => this.#setScoreInScoreBoard(realtimeScore),
+      setScoreInScoreBoard: () => this.#setScoreInScoreBoard(),
       setScoreInModal: (realtimeScore) => this.#setScoreInModal(realtimeScore),
     });
     this.$controlBoard = new ControlBoard({
@@ -59,8 +59,8 @@ export default class App {
     this.rootContainer.appendChild($appContainer);
   }
 
-  #setScoreInScoreBoard(realtimeScore) {
-    return this.$scoreBoard.setScore(realtimeScore);
+  #setScoreInScoreBoard() {
+    return this.$scoreBoard.setScore();
   }
 
   #setScoreInModal(realtimeScore) {

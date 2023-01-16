@@ -34,12 +34,13 @@ export default class ScoreBoard {
     this.setState({ bestScore: getBestScoreFromSession() });
   }
 
-  setScore(score) {
-    if (isRealtimeScoreBiggerThanBestScore(score, this.state.bestScore)) {
-      this.setState({ realtimeScore: score, bestScore: score });
-      setBestScoreInSession(score);
+  setScore() {
+    const newRealtimeScore = this.state.realtimeScore + 1;
+    if (isRealtimeScoreBiggerThanBestScore(newRealtimeScore, this.state.bestScore)) {
+      this.setState({ realtimeScore: newRealtimeScore, bestScore: newRealtimeScore });
+      setBestScoreInSession(newRealtimeScore);
     } else {
-      this.setState({ realtimeScore: score });
+      this.setState({ realtimeScore: newRealtimeScore });
     }
   }
 }
