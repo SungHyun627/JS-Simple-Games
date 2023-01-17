@@ -1,4 +1,4 @@
-<center><img src="./src/assets/snakegame.gif" width=250px height=250px/></center>
+<p align="center"><img src="./src/assets/snakegame.gif" width=300px height=300px/></p>
 
 ### 프로젝트 설명
 
