@@ -14,7 +14,7 @@
 
 ### 기술 스택
 
-- <img src="https://img.shields.io/badge/javascript-Es6+-red"/>
+- <img src="https://img.shields.io/badge/Javascript-ES6+-red"/>
 - <img src="https://img.shields.io/badge/ESLint-8.25.0-red"/> <img src="https://img.shields.io/badge/Prettier-2.7.1-red"/>
 
 ### 디렉터리 구조 및 역할
