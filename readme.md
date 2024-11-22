@@ -10,7 +10,7 @@
 
 ### 프로젝트 세부 정리
 
-- [Notion(Snake Game)](https://accidental-methane-ebf.notion.site/Snake-Game-87321677a16b41eca796fba41a242b78)
+- [Snake Game 구현기](https://accidental-methane-ebf.notion.site/Snake-Game-87321677a16b41eca796fba41a242b78)
 
 ### 기술 스택
 
